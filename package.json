@@ -6,7 +6,7 @@
     "lib": "lib"
   },
   "main": "lib/index.js",
-  "types": "src/index.d.ts",
+  "types": "lib/index.d.ts",
   "dependencies": {
     "mobx-state-tree": "^3.17.2"
   },
