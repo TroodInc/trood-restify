@@ -1,1 +1,1 @@
-export getStore from './api'
+export { default as getStore } from './api'
