@@ -72,7 +72,11 @@ export default (
         const url = apiAdapter.getUrl(apiModelEndpoint, options)
         self.createList(url, page, pageSize)
         apiAdapter.callGet(apiModelEndpoint, { ...options, page, pageSize })
-          .then(resp => self.createList(url, page, pageSize, resp))
+          .then(resp => {
+            if (resp.status) {
+              self.createList(url, page, pageSize, resp)
+            }
+          })
         return Array.from(self.lists.get(url).pageSizes.get(pageSize).pages.get(page).items.values())
       },
     }))
@@ -117,40 +121,62 @@ export default (
         url,
         page = 0,
         pageSize = 0,
-        {
-          data = [],
-          count = 0,
-          status,
-          error: errorData,
-          loaded,
-        } = {},
+        responseData,
       ) {
-        const items = data.reduce((memo, item) => {
-          const key = self.createItem({ ...item, $loaded: loaded, $error: 0, $errorData: undefined })
-          return {
-            ...memo,
-            [key]: key,
+        if (!responseData) {
+          let hasPage = self.lists.has(url) &&
+            self.lists.get(url).pageSizes.has(pageSize) &&
+            self.lists.get(url).pageSizes.get(pageSize).pages.has(page)
+          if (!hasPage) {
+            self.lists.set(url, {
+              url,
+              count: 0,
+              pageSizes: {
+                [pageSize]: {
+                  pageSize,
+                  pages: {
+                    [page]: {
+                      page,
+                    },
+                  },
+                },
+              },
+            })
           }
-        }, {})
+        } else {
+          const {
+            data = [],
+            count = 0,
+            status,
+            error: errorData,
+          } = responseData || {}
+          const items = data.reduce((memo, item) => {
+            const key = self.createItem({ ...item, $loaded: true, $error: 0, $errorData: undefined })
+            return {
+              ...memo,
+              [key]: key,
+            }
+          }, {})
 
-        self.lists.set(url, {
-          url,
-          count,
-          pageSizes: {
-            [pageSize]: {
-              pageSize,
-              pages: {
-                [page]: {
-                  page,
-                  items,
-                  $loaded: loaded,
-                  $error: errorData ? status : 0,
-                  $errorData: errorData,
+          self.lists.set(url, {
+            url,
+            count,
+            pageSizes: {
+              [pageSize]: {
+                pageSize,
+                pages: {
+                  [page]: {
+                    page,
+                    items,
+                    $loaded: true,
+                    $error: errorData ? status : 0,
+                    $errorData: errorData,
+                  },
                 },
               },
             },
-          },
-        })
+          })
+        }
       },
       setItemError(pk, error, errorData) {
         const pkField = Item.identifierAttribute
