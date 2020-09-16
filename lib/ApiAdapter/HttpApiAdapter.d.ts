@@ -1,115 +1,147 @@
 export default HttpApiAdapter;
 declare class HttpApiAdapter {
     static cache: {};
-    constructor({ apiHost, getToken, headers, allowNoTokenEndpoints, defaultResponseFormat, }?: {
+    constructor({ apiHost, getToken, headers, allowNoTokenEndpoints, defaultResponseFormat, paginationTemplate, entityDataAddress, entityErrorAddress, arrayDataAddress, arrayErrorAddress, arrayCountAddress, }?: {
         apiHost: any;
         getToken: any;
-        headers: any;
-        allowNoTokenEndpoints: any;
-        defaultResponseFormat: any;
+        headers?: {
+            'Content-type': string;
+        } | undefined;
+        allowNoTokenEndpoints?: RegExp | undefined;
+        defaultResponseFormat?: string | undefined;
+        paginationTemplate?: string | undefined;
+        entityDataAddress: any;
+        entityErrorAddress: any;
+        arrayDataAddress: any;
+        arrayErrorAddress: any;
+        arrayCountAddress: any;
     });
     getToken: any;
     apiHost: any;
-    headers: any;
-    allowNoTokenEndpoints: any[];
-    defaultResponseFormat: any;
-    getResponseData(response: any, uuid: any, format: any): Promise<{
-        uuid: any;
+    headers: {
+        'Content-type': string;
+    };
+    allowNoTokenEndpoints: RegExp[] | (RegExp & any[]);
+    defaultResponseFormat: string;
+    paginationTemplate: string;
+    entityDataAddress: any;
+    entityErrorAddress: any;
+    arrayDataAddress: any;
+    arrayErrorAddress: any;
+    arrayCountAddress: any;
+    getResponseData(response: any, format: any, pk: any): Promise<{
         status: number;
         error: {
             global: string;
         };
         data?: undefined;
+        count?: undefined;
     } | {
-        uuid: any;
         status: any;
         data: any;
-        error?: undefined;
+        error: any;
+        count: number;
     }>;
-    callApi(endpoint: any, { method, headers: optionsHeaders, body, filters, hash, format, cacheMaxAgeMs, }?: {
+    getUrl(endpoint: any, { pk, filters, hash, page, pageSize, }?: {
+        pk: any;
+        filters: any;
+        hash?: string | undefined;
+        page: any;
+        pageSize: any;
+    }): string;
+    callApi(endpoint: any, { pk, method, headers: optionsHeaders, body, filters, page, pageSize, hash, format, cacheMaxAgeMs, }?: {
+        pk: any;
         method: any;
         headers: any;
         body: any;
         filters: any;
-        hash?: string | undefined;
+        page: any;
+        pageSize: any;
+        hash: any;
         format: any;
         cacheMaxAgeMs?: number | undefined;
     }): Promise<{
-        uuid: any;
-        status: number;
-        error: {
-            global: string;
-        };
-        data?: undefined;
-    } | {
-        uuid: any;
         status: any;
         data: any;
+        error: any;
+        count: number;
+    } | {
+        status: number;
+        error: {
+            global: any;
+        };
+    } | {
+        status: number;
         error?: undefined;
-    } | undefined>;
+    }>;
     callGet: (endpoint: any, options?: {}) => Promise<{
-        uuid: any;
-        status: number;
-        error: {
-            global: string;
-        };
-        data?: undefined;
-    } | {
-        uuid: any;
         status: any;
         data: any;
+        error: any;
+        count: number;
+    } | {
+        status: number;
+        error: {
+            global: any;
+        };
+    } | {
+        status: number;
         error?: undefined;
-    } | undefined>;
+    }>;
     callPost: (endpoint: any, options?: {}) => Promise<{
-        uuid: any;
-        status: number;
-        error: {
-            global: string;
-        };
-        data?: undefined;
-    } | {
-        uuid: any;
         status: any;
         data: any;
+        error: any;
+        count: number;
+    } | {
+        status: number;
+        error: {
+            global: any;
+        };
+    } | {
+        status: number;
         error?: undefined;
-    } | undefined>;
+    }>;
     callPut: (endpoint: any, options?: {}) => Promise<{
-        uuid: any;
-        status: number;
-        error: {
-            global: string;
-        };
-        data?: undefined;
-    } | {
-        uuid: any;
         status: any;
         data: any;
+        error: any;
+        count: number;
+    } | {
+        status: number;
+        error: {
+            global: any;
+        };
+    } | {
+        status: number;
         error?: undefined;
-    } | undefined>;
+    }>;
     callPatch: (endpoint: any, options?: {}) => Promise<{
-        uuid: any;
-        status: number;
-        error: {
-            global: string;
-        };
-        data?: undefined;
-    } | {
-        uuid: any;
         status: any;
         data: any;
+        error: any;
+        count: number;
+    } | {
+        status: number;
+        error: {
+            global: any;
+        };
+    } | {
+        status: number;
         error?: undefined;
-    } | undefined>;
+    }>;
     callDelete: (endpoint: any, options?: {}) => Promise<{
-        uuid: any;
-        status: number;
-        error: {
-            global: string;
-        };
-        data?: undefined;
-    } | {
-        uuid: any;
         status: any;
         data: any;
+        error: any;
+        count: number;
+    } | {
+        status: number;
+        error: {
+            global: any;
+        };
+    } | {
+        status: number;
         error?: undefined;
-    } | undefined>;
+    }>;
 }

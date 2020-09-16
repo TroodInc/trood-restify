@@ -1,2 +1,2 @@
-declare function _default(meta?: {}): {};
+declare function _default(meta: {} | undefined, getToken: any): {};
 export default _default;
