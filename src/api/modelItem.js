@@ -16,7 +16,7 @@ const getFkType = (modelName, getStore, getItemModel) => {
         console.log(value, parent)
         // TODO this method don't called now. Maybe realization incorrect
         return value
-      }
+      },
     }
   ))
 }
@@ -35,47 +35,57 @@ const parseFieldType = (fieldType = '', pk = false, getStore, getItemModel) => {
 
   const fkMatch = fieldType.match(fkRegex)
   if (fkMatch) {
-    return types.maybeNull(getFkType(fkMatch[1], getStore, getItemModel))
+    const fkModelName = fkMatch[1].replace(':', '_')
+    return types.maybeNull(getFkType(fkModelName, getStore, getItemModel))
   }
 
   const fkArrayMatch = fieldType.match(fkArrayRegex)
   if (fkArrayMatch) {
-    return types.maybeNull(types.array(getFkType(fkArrayMatch[1], getStore, getItemModel)))
+    const fkModelName = fkArrayMatch[1].replace(':', '_')
+    return types.maybeNull(types.array(getFkType(fkModelName, getStore, getItemModel)))
   }
 
   return types.maybeNull(types.frozen())
 }
 
-export default (modelName, modelMeta, getStore, getItemModel) => {
-  const fields = Object.keys(modelMeta.fields).reduce((memo, field) => {
-    const fieldType = modelMeta.fields[field]
+export default (apiModelName, apiModelPk, apiModelFields, getStore, getItemModel) => {
+  const fields = Object.keys(apiModelFields).reduce((memo, field) => {
+    const fieldType = apiModelFields[field]
     return {
       ...memo,
-      [field]: parseFieldType(fieldType, field === modelMeta.pk, getStore, getItemModel),
+      [field]: parseFieldType(fieldType, field === apiModelPk, getStore, getItemModel),
     }
   }, {
-    $loadedById: false,
+    $loaded: false,
+    $error: 0,
+    $errorData: types.maybeNull(types.frozen()),
   })
-  return types.model(modelName, fields)
+  return types.model(apiModelName, fields)
     .views(self => ({
       get pk() {
-        return self[modelMeta.pk]
+        return self[apiModelPk]
       },
       getFieldType(field) {
-        const fieldType = modelMeta.fields[field]
+        const fieldType = apiModelFields[field]
+
+        if (!fieldType) {
+          return { isSimple: true }
+        }
 
         const fkMatch = fieldType.match(fkRegex)
         if (fkMatch) {
+          const fkModelName = fkMatch[1].replace(':', '_')
           return {
-            type: getItemModel(fkMatch[1]),
+            type: getItemModel(fkModelName),
             isReference: true,
           }
         }
 
         const fkArrayMatch = fieldType.match(fkArrayRegex)
         if (fkArrayMatch) {
+          const fkModelName = fkArrayMatch[1].replace(':', '_')
           return {
-            type: getItemModel(fkArrayMatch[1]),
+            type: getItemModel(fkModelName),
             isReference: true,
             isReferenceArray: true,
           }
@@ -84,8 +94,8 @@ export default (modelName, modelMeta, getStore, getItemModel) => {
         return {
           type: fieldType,
           isSimple: true,
-          isIdentifier: field === modelMeta.pk,
+          isIdentifier: field === apiModelPk,
         }
-      }
+      },
     }))
 }

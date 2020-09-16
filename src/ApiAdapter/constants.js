@@ -4,6 +4,8 @@ export const defaultHeaders = {
 
 export const defaultAllowNoTokenEndpoints = /.*/
 
+export const defaultPaginationTemplate = 'q=limit({offset},{pageSize})'
+
 export const RESPONSE_FORMATS = {
   'json': 'json',
   'text': 'text',

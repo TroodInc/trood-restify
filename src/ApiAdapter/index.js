@@ -14,7 +14,7 @@ const getHttpApiAdapter = ({
 
   adapters[apiId] = new HttpApiAdapter({
     apiHost,
-    ...other
+    ...other,
   })
 
   return adapters[apiId]

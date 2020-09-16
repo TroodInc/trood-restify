@@ -1,3 +1,5 @@
+import getHttpApiAdapter from '../ApiAdapter'
+
 import ModelList from './modelList'
 
 
@@ -10,12 +12,26 @@ const setItemModel = (modelName, model) => {
   registeredItemModels[modelName] = model
 }
 
-export default (meta = {}) => {
-  Object.keys(meta).forEach(modelName => {
-    const list = ModelList(modelName, meta[modelName], getStore, getItemModel, setItemModel)
-    store[modelName] = list.create({
-      modelName,
-      lists: {},
+export default (meta = {}, getToken) => {
+  Object.keys(meta).forEach(apiName => {
+    const apiConfig = meta[apiName]
+    const apiAdapter = getHttpApiAdapter({
+      ...apiConfig,
+      apiName,
+      getToken,
+    })
+    Object.keys(apiConfig.objects).forEach(modelName => {
+      const modelConfig = apiConfig.objects[modelName]
+      const apiModelName = `${apiName}_${modelName}`
+      const apiModelConfig = {
+        apiAdapter,
+        apiModelName,
+        apiModelPk: modelConfig.pk,
+        apiModelEndpoint: modelConfig.endpoint,
+        apiModelFields: modelConfig.fields,
+      }
+      const list = ModelList(apiModelConfig, getStore, getItemModel, setItemModel)
+      store[apiModelName] = list.create({ apiModelName })
     })
   })
 
