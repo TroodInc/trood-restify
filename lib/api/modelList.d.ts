@@ -84,7 +84,9 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
         }, {}, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
     }, {}, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
 }, {
+    asyncGetByPk(pk: any, options?: {}): any;
     getByPk(pk: any, options?: {}): {};
+    asyncGetPage(page?: number, pageSize?: number, options?: {}): any;
     getPage(page?: number, pageSize?: number, options?: {}): ({
         $loaded: boolean;
         $error: number;
@@ -148,6 +150,9 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
             isReferenceArray?: undefined;
         };
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>>)[];
+    getInfinityPages(pageSize?: number, options?: {}): any[];
+    getInfinityNextPageNumber(pageSize?: number, options?: {}): number | undefined;
+    getInfinityNextPage(pageSize?: number, options?: {}): void;
 } & {
     createItem(data: any): any;
     createList(url: any, page: number | undefined, pageSize: number | undefined, responseData: any): void;

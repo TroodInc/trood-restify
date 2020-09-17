@@ -49,9 +49,9 @@ export default (
     lists: types.map(ItemMap),
   })
     .views(self => ({
-      getByPk(pk, options = {}) {
+      asyncGetByPk(pk, options = {}) {
         self.createItem(pk)
-        apiAdapter.callGet(apiModelEndpoint, { ...options, pk })
+        return apiAdapter.callGet(apiModelEndpoint, { ...options, pk })
           .then(({ status, error, data }) => {
             if (status) {
               if (error) {
@@ -65,19 +65,68 @@ export default (
                 })
               }
             }
+            return self.items.get(pk) || {}
           })
+      },
+      getByPk(pk, options = {}) {
+        self.asyncGetByPk(pk, options)
         return self.items.get(pk) || {}
       },
-      getPage(page = 0, pageSize = 0, options = {}) {
+      asyncGetPage(page = 0, pageSize = 0, options = {}) {
         const url = apiAdapter.getUrl(apiModelEndpoint, options)
         self.createList(url, page, pageSize)
-        apiAdapter.callGet(apiModelEndpoint, { ...options, page, pageSize })
+        return apiAdapter.callGet(apiModelEndpoint, { ...options, page, pageSize })
           .then(resp => {
             if (resp.status) {
               self.createList(url, page, pageSize, resp)
             }
+            const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
+            if (!pageItem) return []
+            return Array.from(pageItem.items.values())
           })
-        return Array.from(self.lists.get(url).pageSizes.get(pageSize).pages.get(page).items.values())
+      },
+      getPage(page = 0, pageSize = 0, options = {}) {
+        const url = apiAdapter.getUrl(apiModelEndpoint, options)
+        self.asyncGetPage(page, pageSize, options)
+        const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
+        if (!pageItem) return []
+        return Array.from(pageItem.items.values())
+      },
+      getInfinityPages(pageSize = 0, options = {}) {
+        let page = 0
+        const url = apiAdapter.getUrl(apiModelEndpoint, options)
+        if (
+          !(self.lists.has(url) &&
+          self.lists.get(url).pageSizes.has(pageSize) &&
+          self.lists.get(url).pageSizes.get(pageSize).pages.has(page))
+        ) {
+          self.asyncGetPage(page, pageSize, options)
+        }
+        let pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
+        let items = []
+        while (pageItem) {
+          items = [...items, ...Array.from(pageItem.items.values())]
+          page += 1
+          pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
+        }
+        return items
+      },
+      getInfinityNextPageNumber(pageSize = 0, options = {}) {
+        let page = 0
+        const url = apiAdapter.getUrl(apiModelEndpoint, options)
+        const { count, pageSizes } = self.lists.get(url)
+        const { pages } = pageSizes.get(pageSize)
+        while (pages.has(page)) {
+          page += 1
+        }
+        if (page * pageSize > count) return undefined
+        return page
+      },
+      getInfinityNextPage(pageSize = 0, options = {}) {
+        const page = self.getInfinityNextPageNumber(pageSize, options)
+        if (page !== undefined) {
+          self.asyncGetPage(page, pageSize, options)
+        }
       },
     }))
     .actions(self => ({
@@ -123,25 +172,19 @@ export default (
         pageSize = 0,
         responseData,
       ) {
+        let pageData
+        let pageSizeData
+        let listData
         if (!responseData) {
-          let hasPage = self.lists.has(url) &&
-            self.lists.get(url).pageSizes.has(pageSize) &&
-            self.lists.get(url).pageSizes.get(pageSize).pages.has(page)
-          if (!hasPage) {
-            self.lists.set(url, {
-              url,
-              count: 0,
-              pageSizes: {
-                [pageSize]: {
-                  pageSize,
-                  pages: {
-                    [page]: {
-                      page,
-                    },
-                  },
-                },
-              },
-            })
+          pageSizeData = {
+            pageSize,
+          }
+          listData = {
+            url,
+            count: 0,
+            pageSizes: {
+              [pageSize]: pageSizeData,
+            },
           }
         } else {
           const {
@@ -149,7 +192,7 @@ export default (
             count = 0,
             status,
             error: errorData,
-          } = responseData || {}
+          } = responseData
           const items = data.reduce((memo, item) => {
             const key = self.createItem({ ...item, $loaded: true, $error: 0, $errorData: undefined })
             return {
@@ -158,24 +201,44 @@ export default (
             }
           }, {})
 
-          self.lists.set(url, {
+          pageData = {
+            page,
+            items,
+            $loaded: true,
+            $error: errorData ? status : 0,
+            $errorData: errorData,
+          }
+          pageSizeData = {
+            pageSize,
+            pages: { [page]: pageData },
+          }
+          listData = {
             url,
             count,
             pageSizes: {
-              [pageSize]: {
-                pageSize,
-                pages: {
-                  [page]: {
-                    page,
-                    items,
-                    $loaded: true,
-                    $error: errorData ? status : 0,
-                    $errorData: errorData,
-                  },
-                },
-              },
+              [pageSize]: pageSizeData,
             },
-          })
+          }
+        }
+
+        const listItem = self.lists.get(url)
+        if (listItem) {
+          const pageSizeItem = listItem.pageSizes.get(pageSize)
+          if (pageSizeItem) {
+            const pageItem = pageSizeItem.pages.get(page)
+            if (pageItem && responseData) {
+              pageSizeItem.pages.set(page, pageData)
+            } else if (!pageItem && pageData) {
+              pageSizeItem.pages.set(page, pageData)
+            }
+          } else {
+            listItem.pageSizes.set(pageSize, pageSizeData)
+          }
+        } else {
+          self.lists.set(url, listData)
+        }
+        if (listData.count) {
+          listItem.count = listData.count
         }
       },
       setItemError(pk, error, errorData) {
