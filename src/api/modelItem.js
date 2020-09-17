@@ -10,7 +10,7 @@ const getFkType = (modelName, getStore, getItemModel) => {
     {
       get(pk) {
         const store = getStore()
-        return store[modelName].items.get(pk)
+        return store[modelName].items.getWithProxy(pk)
       },
       set(value, parent) {
         console.log(value, parent)

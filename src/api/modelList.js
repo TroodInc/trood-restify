@@ -45,7 +45,18 @@ export default (
 
   return types.model(`${apiModelName}_list`, {
     apiModelName: types.identifier,
-    items: types.map(Item),
+    items: types.map(Item)
+      .hooks(self => ({
+        getWithProxy(key) {
+          const item = self.get(key)
+          return new Proxy(item, {
+            get(target, prop) {
+              // console.log(prop)
+              return target[prop]
+            },
+          })
+        },
+      })),
     lists: types.map(ItemMap),
   })
     .views(self => ({
@@ -65,12 +76,12 @@ export default (
                 })
               }
             }
-            return self.items.get(pk) || {}
+            return self.items.getWithProxy(pk) || {}
           })
       },
       getByPk(pk, options = {}) {
         self.asyncGetByPk(pk, options)
-        return self.items.get(pk) || {}
+        return self.items.getWithProxy(pk) || {}
       },
       asyncGetPage(page = 0, pageSize = 0, options = {}) {
         const url = apiAdapter.getUrl(apiModelEndpoint, options)
@@ -142,7 +153,7 @@ export default (
 
           self.items.set(pk, simpleData) // pre create item for reference
 
-          const newItem = self.items.get(pk)
+          const newItem = self.items.getWithProxy(pk)
           Object.keys(data).forEach(key => {
             const keyType = newItem.getFieldType(key)
             if (keyType.isSimple) {

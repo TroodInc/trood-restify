@@ -85,7 +85,7 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
     }, {}, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
 }, {
     asyncGetByPk(pk: any, options?: {}): any;
-    getByPk(pk: any, options?: {}): {};
+    getByPk(pk: any, options?: {}): any;
     asyncGetPage(page?: number, pageSize?: number, options?: {}): any;
     getPage(page?: number, pageSize?: number, options?: {}): ({
         $loaded: boolean;
