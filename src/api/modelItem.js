@@ -10,7 +10,7 @@ const getFkType = (modelName, getStore, getItemModel) => {
     {
       get(pk) {
         const store = getStore()
-        return store[modelName].items.getWithProxy(pk)
+        return store[modelName].items.getWithProxy(pk, getStore())
       },
       set(value, parent) {
         console.log(value, parent)
@@ -56,7 +56,8 @@ export default (apiModelName, apiModelPk, apiModelFields, getStore, getItemModel
       [field]: parseFieldType(fieldType, field === apiModelPk, getStore, getItemModel),
     }
   }, {
-    $loaded: false,
+    $loading: false,
+    $loadedById: false,
     $error: 0,
     $errorData: types.maybeNull(types.frozen()),
   })
@@ -87,7 +88,7 @@ export default (apiModelName, apiModelPk, apiModelFields, getStore, getItemModel
           return {
             type: getItemModel(fkModelName),
             isReference: true,
-            isReferenceArray: true,
+            isArray: true,
           }
         }
 
@@ -95,6 +96,7 @@ export default (apiModelName, apiModelPk, apiModelFields, getStore, getItemModel
           type: fieldType,
           isSimple: true,
           isIdentifier: field === apiModelPk,
+          isArray: fieldType === 'array',
         }
       },
     }))

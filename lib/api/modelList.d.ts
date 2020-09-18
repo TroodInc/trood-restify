@@ -7,7 +7,8 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
 }, getStore: any, getItemModel: any, setItemModel: any): import("mobx-state-tree").IModelType<{
     apiModelName: import("mobx-state-tree").ISimpleType<string>;
     items: import("mobx-state-tree").IMapType<import("mobx-state-tree").IModelType<{
-        $loaded: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
+        $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
+        $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
         $error: import("mobx-state-tree").IType<number | undefined, number, number>;
         $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
     }, {
@@ -16,26 +17,26 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
             isSimple: boolean;
             type?: undefined;
             isReference?: undefined;
-            isReferenceArray?: undefined;
+            isArray?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isReference: boolean;
             isSimple?: undefined;
-            isReferenceArray?: undefined;
+            isArray?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isReference: boolean;
-            isReferenceArray: boolean;
+            isArray: boolean;
             isSimple?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isSimple: boolean;
             isIdentifier: boolean;
+            isArray: boolean;
             isReference?: undefined;
-            isReferenceArray?: undefined;
         };
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
     lists: import("mobx-state-tree").IMapType<import("mobx-state-tree").IModelType<{
@@ -46,7 +47,8 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
             pages: import("mobx-state-tree").IMapType<import("mobx-state-tree").IModelType<{
                 page: import("mobx-state-tree").ISimpleType<number>;
                 items: import("mobx-state-tree").IMapType<import("mobx-state-tree").IReferenceType<import("mobx-state-tree").IModelType<{
-                    $loaded: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
+                    $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
+                    $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
                     $error: import("mobx-state-tree").IType<number | undefined, number, number>;
                     $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
                 }, {
@@ -55,29 +57,29 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
                         isSimple: boolean;
                         type?: undefined;
                         isReference?: undefined;
-                        isReferenceArray?: undefined;
+                        isArray?: undefined;
                         isIdentifier?: undefined;
                     } | {
                         type: any;
                         isReference: boolean;
                         isSimple?: undefined;
-                        isReferenceArray?: undefined;
+                        isArray?: undefined;
                         isIdentifier?: undefined;
                     } | {
                         type: any;
                         isReference: boolean;
-                        isReferenceArray: boolean;
+                        isArray: boolean;
                         isSimple?: undefined;
                         isIdentifier?: undefined;
                     } | {
                         type: any;
                         isSimple: boolean;
                         isIdentifier: boolean;
+                        isArray: boolean;
                         isReference?: undefined;
-                        isReferenceArray?: undefined;
                     };
                 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>>;
-                $loaded: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
+                $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
                 $error: import("mobx-state-tree").IType<number | undefined, number, number>;
                 $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
             }, {}, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
@@ -88,7 +90,8 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
     getByPk(pk: any, options?: {}): any;
     asyncGetPage(page?: number, pageSize?: number, options?: {}): any;
     getPage(page?: number, pageSize?: number, options?: {}): ({
-        $loaded: boolean;
+        $loading: boolean;
+        $loadedById: boolean;
         $error: number;
         $errorData: any;
     } & import("mobx-state-tree/dist/internal").NonEmptyObject & {
@@ -97,29 +100,30 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
             isSimple: boolean;
             type?: undefined;
             isReference?: undefined;
-            isReferenceArray?: undefined;
+            isArray?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isReference: boolean;
             isSimple?: undefined;
-            isReferenceArray?: undefined;
+            isArray?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isReference: boolean;
-            isReferenceArray: boolean;
+            isArray: boolean;
             isSimple?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isSimple: boolean;
             isIdentifier: boolean;
+            isArray: boolean;
             isReference?: undefined;
-            isReferenceArray?: undefined;
         };
     } & import("mobx-state-tree").IStateTreeNode<import("mobx-state-tree").IReferenceType<import("mobx-state-tree").IModelType<{
-        $loaded: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
+        $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
+        $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
         $error: import("mobx-state-tree").IType<number | undefined, number, number>;
         $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
     }, {
@@ -128,26 +132,26 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
             isSimple: boolean;
             type?: undefined;
             isReference?: undefined;
-            isReferenceArray?: undefined;
+            isArray?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isReference: boolean;
             isSimple?: undefined;
-            isReferenceArray?: undefined;
+            isArray?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isReference: boolean;
-            isReferenceArray: boolean;
+            isArray: boolean;
             isSimple?: undefined;
             isIdentifier?: undefined;
         } | {
             type: any;
             isSimple: boolean;
             isIdentifier: boolean;
+            isArray: boolean;
             isReference?: undefined;
-            isReferenceArray?: undefined;
         };
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>>)[];
     getInfinityPages(pageSize?: number, options?: {}): any[];
@@ -156,6 +160,7 @@ declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoi
 } & {
     createItem(data: any): any;
     createList(url: any, page: number | undefined, pageSize: number | undefined, responseData: any): void;
+    setItemLoading(pk: any, loading: any): void;
     setItemError(pk: any, error: any, errorData: any): void;
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>;
 export default _default;

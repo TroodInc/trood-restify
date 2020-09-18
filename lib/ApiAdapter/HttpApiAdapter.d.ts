@@ -60,7 +60,7 @@ declare class HttpApiAdapter {
         hash: any;
         format: any;
         cacheMaxAgeMs?: number | undefined;
-    }): Promise<{
+    }, beforeHttpCall?: () => void): Promise<{
         status: any;
         data: any;
         error: any;
@@ -74,7 +74,7 @@ declare class HttpApiAdapter {
         status: number;
         error?: undefined;
     }>;
-    callGet: (endpoint: any, options?: {}) => Promise<{
+    callGet: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
         error: any;
@@ -88,7 +88,7 @@ declare class HttpApiAdapter {
         status: number;
         error?: undefined;
     }>;
-    callPost: (endpoint: any, options?: {}) => Promise<{
+    callPost: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
         error: any;
@@ -102,7 +102,7 @@ declare class HttpApiAdapter {
         status: number;
         error?: undefined;
     }>;
-    callPut: (endpoint: any, options?: {}) => Promise<{
+    callPut: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
         error: any;
@@ -116,7 +116,7 @@ declare class HttpApiAdapter {
         status: number;
         error?: undefined;
     }>;
-    callPatch: (endpoint: any, options?: {}) => Promise<{
+    callPatch: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
         error: any;
@@ -130,7 +130,7 @@ declare class HttpApiAdapter {
         status: number;
         error?: undefined;
     }>;
-    callDelete: (endpoint: any, options?: {}) => Promise<{
+    callDelete: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
         error: any;

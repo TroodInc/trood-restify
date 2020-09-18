@@ -136,18 +136,22 @@ class HttpApiAdapter {
     return url.toString()
   }
 
-  async callApi(endpoint, {
-    pk,
-    method,
-    headers: optionsHeaders,
-    body,
-    filters,
-    page,
-    pageSize,
-    hash,
-    format,
-    cacheMaxAgeMs = 60 * 1000,
-  } = {}) {
+  async callApi(
+    endpoint,
+    {
+      pk,
+      method,
+      headers: optionsHeaders,
+      body,
+      filters,
+      page,
+      pageSize,
+      hash,
+      format,
+      cacheMaxAgeMs = 60 * 1000,
+    } = {},
+    beforeHttpCall = () => {},
+  ) {
     let token
     if (typeof this.getToken === 'function') {
       token = this.getToken()
@@ -219,6 +223,8 @@ class HttpApiAdapter {
       ...optionsHeaders,
     }
 
+    beforeHttpCall()
+
     const response = await fetch(url, {
       method,
       body,
@@ -238,11 +244,16 @@ class HttpApiAdapter {
     return responseData
   }
 
-  callGet = (endpoint, options = {}) => this.callApi(endpoint, { ...options, method: 'GET', body: undefined })
-  callPost = (endpoint, options = {}) => this.callApi(endpoint, { ...options, method: 'POST' })
-  callPut = (endpoint, options = {}) => this.callApi(endpoint, { ...options, method: 'PUT' })
-  callPatch = (endpoint, options = {}) => this.callApi(endpoint, { ...options, method: 'PATCH' })
-  callDelete = (endpoint, options = {}) => this.callApi(endpoint, { ...options, method: 'DELETE' })
+  callGet = (endpoint, options = {}, ...other) =>
+    this.callApi(endpoint, { ...options, method: 'GET', body: undefined }, ...other)
+  callPost = (endpoint, options = {}, ...other) =>
+    this.callApi(endpoint, { ...options, method: 'POST' }, ...other)
+  callPut = (endpoint, options = {}, ...other) =>
+    this.callApi(endpoint, { ...options, method: 'PUT' }, ...other)
+  callPatch = (endpoint, options = {}, ...other) =>
+    this.callApi(endpoint, { ...options, method: 'PATCH' }, ...other)
+  callDelete = (endpoint, options = {}, ...other) =>
+    this.callApi(endpoint, { ...options, method: 'DELETE' }, ...other)
 }
 
 export default HttpApiAdapter

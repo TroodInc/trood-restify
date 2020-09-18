@@ -27,7 +27,7 @@ export default (
   const ItemPage = types.model(`${apiModelName}_page`, {
     page: types.identifierNumber,
     items: types.map(types.reference(Item)),
-    $loaded: false,
+    $loading: false,
     $error: 0,
     $errorData: types.maybeNull(types.frozen()),
   })
@@ -47,11 +47,24 @@ export default (
     apiModelName: types.identifier,
     items: types.map(Item)
       .hooks(self => ({
-        getWithProxy(key) {
+        getWithProxy(key, store) {
           const item = self.get(key)
+          const modelStore = store[Item.name]
           return new Proxy(item, {
             get(target, prop) {
-              // console.log(prop)
+              const value = target[prop]
+              const type = target.getFieldType(prop)
+              if (
+                Object.prototype.hasOwnProperty.call(target, prop) &&
+                (value === null || value === undefined || (
+                  type.isArray && !value.length
+                ))
+              ) {
+                if (!target.$loading && !target.$loadedById) {
+                  modelStore.getByPk(target.pk)
+                }
+                if (type.isArray) return []
+              }
               return target[prop]
             },
           })
@@ -62,7 +75,9 @@ export default (
     .views(self => ({
       asyncGetByPk(pk, options = {}) {
         self.createItem(pk)
-        return apiAdapter.callGet(apiModelEndpoint, { ...options, pk })
+        return apiAdapter.callGet(apiModelEndpoint, { ...options, pk }, () => {
+          self.setItemLoading(pk, true)
+        })
           .then(({ status, error, data }) => {
             if (status) {
               if (error) {
@@ -70,18 +85,19 @@ export default (
               } else {
                 self.createItem({
                   ...data,
-                  $loaded: true,
+                  $loading: false,
+                  $loadedById: !options.filters,
                   $error: 0,
                   $errorData: null,
                 })
               }
             }
-            return self.items.getWithProxy(pk) || {}
+            return self.items.getWithProxy(pk, getStore()) || {}
           })
       },
       getByPk(pk, options = {}) {
         self.asyncGetByPk(pk, options)
-        return self.items.getWithProxy(pk) || {}
+        return self.items.getWithProxy(pk, getStore()) || {}
       },
       asyncGetPage(page = 0, pageSize = 0, options = {}) {
         const url = apiAdapter.getUrl(apiModelEndpoint, options)
@@ -143,17 +159,15 @@ export default (
     .actions(self => ({
       createItem(data) {
         const pkField = Item.identifierAttribute
-        let pk
-        let normalizedData
 
         if (typeof data === 'object') {
-          pk = data[pkField]
-          normalizedData = getJsonCopyByPk(self.items, pk)
+          const pk = data[pkField]
+          const normalizedData = getJsonCopyByPk(self.items, pk)
           const simpleData = { [pkField]: pk }
 
-          self.items.set(pk, simpleData) // pre create item for reference
+          if (!self.items.has(pk)) self.items.set(pk, simpleData) // pre create item for reference
 
-          const newItem = self.items.getWithProxy(pk)
+          const newItem = self.items.getWithProxy(pk, getStore())
           Object.keys(data).forEach(key => {
             const keyType = newItem.getFieldType(key)
             if (keyType.isSimple) {
@@ -161,21 +175,23 @@ export default (
             } else if (keyType.isReference) {
               const store = getStore()
               // create reference objects
-              if (keyType.isReferenceArray) {
+              if (keyType.isArray) {
                 normalizedData[key] = data[key].map(item => store[keyType.type.name].createItem(item))
               } else {
                 normalizedData[key] = store[keyType.type.name].createItem(data[key])
               }
             }
           })
-        } else {
-          pk = data
-          normalizedData = getJsonCopyByPk(self.items, pk)
-          normalizedData[pkField] = pk
+
+          self.items.set(pk, normalizedData)
+          return pk
         }
 
-        self.items.set(pk, normalizedData)
-        return pk
+        if (!self.items.has(data)) {
+          self.items.set(data, { [pkField]: data })
+        }
+
+        return data
       },
       createList(
         url,
@@ -205,7 +221,7 @@ export default (
             error: errorData,
           } = responseData
           const items = data.reduce((memo, item) => {
-            const key = self.createItem({ ...item, $loaded: true, $error: 0, $errorData: undefined })
+            const key = self.createItem({ ...item, $error: 0, $errorData: undefined })
             return {
               ...memo,
               [key]: key,
@@ -215,7 +231,6 @@ export default (
           pageData = {
             page,
             items,
-            $loaded: true,
             $error: errorData ? status : 0,
             $errorData: errorData,
           }
@@ -252,11 +267,16 @@ export default (
           listItem.count = listData.count
         }
       },
+      setItemLoading(pk, loading) {
+        if (self.items.has(pk)) {
+          self.items.get(pk).$loading = loading
+        }
+      },
       setItemError(pk, error, errorData) {
         const pkField = Item.identifierAttribute
         self.items.set(pk, {
           [pkField]: pk,
-          $loaded: true,
+          $loading: false,
           $error: error,
           $errorData: errorData,
         })
