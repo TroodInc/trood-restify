@@ -21,7 +21,7 @@ export default (
   getItemModel,
   setItemModel,
 ) => {
-  const Item = modelItem(apiModelName, apiModelPk, apiModelFields, getStore, getItemModel)
+  const Item = modelItem(apiAdapter.apiName, apiModelName, apiModelPk, apiModelFields, getStore, getItemModel)
   setItemModel(apiModelName, Item)
 
   const ItemPage = types.model(`${apiModelName}_page`, {

@@ -21,7 +21,7 @@ const getFkType = (modelName, getStore, getItemModel) => {
   ))
 }
 
-const parseFieldType = (fieldType = '', pk = false, getStore, getItemModel) => {
+const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemModel) => {
   if (pk) {
     if (fieldType === 'number') {
       return types.identifierNumber
@@ -35,25 +35,35 @@ const parseFieldType = (fieldType = '', pk = false, getStore, getItemModel) => {
 
   const fkMatch = fieldType.match(fkRegex)
   if (fkMatch) {
-    const fkModelName = fkMatch[1].replace(':', '_')
+    let fkModelName = fkMatch[1]
+    if (fkModelName.includes(':')) {
+      fkModelName = fkModelName.replace(':', '_')
+    } else {
+      fkModelName = `${apiName}_${fkModelName}`
+    }
     return types.maybeNull(getFkType(fkModelName, getStore, getItemModel))
   }
 
   const fkArrayMatch = fieldType.match(fkArrayRegex)
   if (fkArrayMatch) {
-    const fkModelName = fkArrayMatch[1].replace(':', '_')
+    let fkModelName = fkArrayMatch[1]
+    if (fkModelName.includes(':')) {
+      fkModelName = fkModelName.replace(':', '_')
+    } else {
+      fkModelName = `${apiName}_${fkModelName}`
+    }
     return types.maybeNull(types.array(getFkType(fkModelName, getStore, getItemModel)))
   }
 
   return types.maybeNull(types.frozen())
 }
 
-export default (apiModelName, apiModelPk, apiModelFields, getStore, getItemModel) => {
+export default (apiName, apiModelName, apiModelPk, apiModelFields, getStore, getItemModel) => {
   const fields = Object.keys(apiModelFields).reduce((memo, field) => {
     const fieldType = apiModelFields[field]
     return {
       ...memo,
-      [field]: parseFieldType(fieldType, field === apiModelPk, getStore, getItemModel),
+      [field]: parseFieldType(apiName, fieldType, field === apiModelPk, getStore, getItemModel),
     }
   }, {
     $loading: false,
@@ -75,7 +85,12 @@ export default (apiModelName, apiModelPk, apiModelFields, getStore, getItemModel
 
         const fkMatch = fieldType.match(fkRegex)
         if (fkMatch) {
-          const fkModelName = fkMatch[1].replace(':', '_')
+          let fkModelName = fkMatch[1]
+          if (fkModelName.includes(':')) {
+            fkModelName = fkModelName.replace(':', '_')
+          } else {
+            fkModelName = `${apiName}_${fkModelName}`
+          }
           return {
             type: getItemModel(fkModelName),
             isReference: true,
@@ -84,7 +99,12 @@ export default (apiModelName, apiModelPk, apiModelFields, getStore, getItemModel
 
         const fkArrayMatch = fieldType.match(fkArrayRegex)
         if (fkArrayMatch) {
-          const fkModelName = fkArrayMatch[1].replace(':', '_')
+          let fkModelName = fkArrayMatch[1]
+          if (fkModelName.includes(':')) {
+            fkModelName = fkModelName.replace(':', '_')
+          } else {
+            fkModelName = `${apiName}_${fkModelName}`
+          }
           return {
             type: getItemModel(fkModelName),
             isReference: true,

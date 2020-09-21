@@ -4,20 +4,18 @@ const adapters = {}
 
 const getHttpApiAdapter = ({
   apiName,
-  apiHost,
   ...other
 } = {}) => {
-  const apiId = apiName || apiHost
-  const adapter = adapters[apiId]
+  const adapter = adapters[apiName]
 
   if (adapter) return adapter
 
-  adapters[apiId] = new HttpApiAdapter({
-    apiHost,
+  adapters[apiName] = new HttpApiAdapter({
+    apiName,
     ...other,
   })
 
-  return adapters[apiId]
+  return adapters[apiName]
 }
 
 export default getHttpApiAdapter

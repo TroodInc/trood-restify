@@ -19,6 +19,7 @@ class HttpApiAdapter {
   static cache = {}
 
   constructor({
+    apiName,
     apiHost,
     getToken,
     headers = defaultHeaders,
@@ -31,8 +32,9 @@ class HttpApiAdapter {
     arrayErrorAddress,
     arrayCountAddress,
   } = {}) {
-    this.getToken = getToken
+    this.apiName = apiName
     this.apiHost = apiHost
+    this.getToken = getToken
     this.headers = headers
     this.allowNoTokenEndpoints = allowNoTokenEndpoints
     if (!Array.isArray(this.allowNoTokenEndpoints)) {

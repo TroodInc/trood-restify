@@ -1,7 +1,8 @@
 export default HttpApiAdapter;
 declare class HttpApiAdapter {
     static cache: {};
-    constructor({ apiHost, getToken, headers, allowNoTokenEndpoints, defaultResponseFormat, paginationTemplate, entityDataAddress, entityErrorAddress, arrayDataAddress, arrayErrorAddress, arrayCountAddress, }?: {
+    constructor({ apiName, apiHost, getToken, headers, allowNoTokenEndpoints, defaultResponseFormat, paginationTemplate, entityDataAddress, entityErrorAddress, arrayDataAddress, arrayErrorAddress, arrayCountAddress, }?: {
+        apiName: any;
         apiHost: any;
         getToken: any;
         headers?: {
@@ -16,8 +17,9 @@ declare class HttpApiAdapter {
         arrayErrorAddress: any;
         arrayCountAddress: any;
     });
-    getToken: any;
+    apiName: any;
     apiHost: any;
+    getToken: any;
     headers: {
         'Content-type': string;
     };
