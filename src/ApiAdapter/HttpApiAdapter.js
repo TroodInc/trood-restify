@@ -27,6 +27,7 @@ class HttpApiAdapter {
     defaultResponseFormat = RESPONSE_FORMATS.json,
     paginationTemplate = defaultPaginationTemplate,
     entityDataAddress,
+    genericTypeAddress = '_object',
     entityErrorAddress,
     arrayDataAddress,
     arrayErrorAddress,
@@ -43,10 +44,15 @@ class HttpApiAdapter {
     this.defaultResponseFormat = defaultResponseFormat
     this.paginationTemplate = paginationTemplate
     this.entityDataAddress = entityDataAddress
+    this.genericTypeAddress = genericTypeAddress
     this.entityErrorAddress = entityErrorAddress
     this.arrayDataAddress = arrayDataAddress
     this.arrayErrorAddress = arrayErrorAddress
     this.arrayCountAddress = arrayCountAddress
+  }
+
+  getItemGenericType(item) {
+    return `${this.apiName}_${get(item, this.genericTypeAddress)}`
   }
 
   async getResponseData(response, format, pk) {

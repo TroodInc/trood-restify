@@ -1,4 +1,4 @@
-import { types, getSnapshot } from 'mobx-state-tree'
+import { types, getSnapshot, isArrayType } from 'mobx-state-tree'
 
 import modelItem from './modelItem'
 
@@ -7,6 +7,14 @@ const getJsonCopyByPk = (items, pk) => {
   const item = items.get(pk)
   if (!item) return {}
   return { ...getSnapshot(item) }
+}
+
+const getReferences = type => {
+  if (!type) return undefined
+  const matches = Array.from((type.name || '').matchAll(/lateRef:([\w]*)/g))
+    .map(match => match[1])
+  if (matches.length) return matches
+  return undefined
 }
 
 export default (
@@ -53,17 +61,19 @@ export default (
           return new Proxy(item, {
             get(target, prop) {
               const value = target[prop]
-              const type = target.getFieldType(prop)
+              const propType = Item.properties[prop]
+              if (!propType) return value
+              const isArray = isArrayType(propType)
               if (
                 Object.prototype.hasOwnProperty.call(target, prop) &&
                 (value === null || value === undefined || (
-                  type.isArray && !value.length
+                  isArray && !value.length
                 ))
               ) {
                 if (!target.$loading && !target.$loadedById) {
                   modelStore.getByPk(target.pk)
                 }
-                if (type.isArray) return []
+                if (isArray) return []
               }
               return target[prop]
             },
@@ -167,31 +177,42 @@ export default (
 
           if (!self.items.has(pk)) self.items.set(pk, simpleData) // pre create item for reference
 
-          const newItem = self.items.getWithProxy(pk, getStore())
           Object.keys(data).forEach(key => {
-            const keyType = newItem.getFieldType(key)
-            if (keyType.isSimple) {
-              normalizedData[key] = data[key]
-            } else if (keyType.isReference) {
+            const keyType = Item.properties[key]
+            const references = getReferences(keyType)
+            if (references) {
               const store = getStore()
-              // create reference objects
-              if (keyType.isArray) {
-                normalizedData[key] = data[key].map(item => store[keyType.type.name].createItem(item))
+              if (isArrayType(keyType)) {
+                if (references.length === 1) {
+                  normalizedData[key] = data[key].map(item => store[references[0]].createItem(item))
+                } else {
+                  normalizedData[key] = data[key].map(item => {
+                    const genericModel = apiAdapter.getItemGenericType(item)
+                    return store[genericModel].createItem(item)
+                  })
+                }
               } else {
-                normalizedData[key] = store[keyType.type.name].createItem(data[key])
+                if (references.length === 1) {
+                  normalizedData[key] = store[references].createItem(data[key])
+                } else {
+                  const genericModel = apiAdapter.getItemGenericType(data[key])
+                  normalizedData[key] = store[genericModel].createItem(data[key])
+                }
               }
+            } else {
+              normalizedData[key] = data[key]
             }
           })
 
           self.items.set(pk, normalizedData)
-          return pk
+          return self.items.get(pk)
         }
 
         if (!self.items.has(data)) {
           self.items.set(data, { [pkField]: data })
         }
 
-        return data
+        return self.items.get(data)
       },
       createList(
         url,

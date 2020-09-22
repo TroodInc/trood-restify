@@ -1,7 +1,7 @@
 export default HttpApiAdapter;
 declare class HttpApiAdapter {
     static cache: {};
-    constructor({ apiName, apiHost, getToken, headers, allowNoTokenEndpoints, defaultResponseFormat, paginationTemplate, entityDataAddress, entityErrorAddress, arrayDataAddress, arrayErrorAddress, arrayCountAddress, }?: {
+    constructor({ apiName, apiHost, getToken, headers, allowNoTokenEndpoints, defaultResponseFormat, paginationTemplate, entityDataAddress, genericTypeAddress, entityErrorAddress, arrayDataAddress, arrayErrorAddress, arrayCountAddress, }?: {
         apiName: any;
         apiHost: any;
         getToken: any;
@@ -12,6 +12,7 @@ declare class HttpApiAdapter {
         defaultResponseFormat?: string | undefined;
         paginationTemplate?: string | undefined;
         entityDataAddress: any;
+        genericTypeAddress?: string | undefined;
         entityErrorAddress: any;
         arrayDataAddress: any;
         arrayErrorAddress: any;
@@ -27,10 +28,12 @@ declare class HttpApiAdapter {
     defaultResponseFormat: string;
     paginationTemplate: string;
     entityDataAddress: any;
+    genericTypeAddress: string;
     entityErrorAddress: any;
     arrayDataAddress: any;
     arrayErrorAddress: any;
     arrayCountAddress: any;
+    getItemGenericType(item: any): string;
     getResponseData(response: any, format: any, pk: any): Promise<{
         status: number;
         error: {

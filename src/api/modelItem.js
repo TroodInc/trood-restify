@@ -5,20 +5,27 @@ const fkRegex = /fk\((.*)\)/
 const fkArrayRegex = /fk_array\((.*)\)/
 
 const getFkType = (modelName, getStore, getItemModel) => {
-  return types.late(() => types.reference(
+  return types.late(`lateRef:${modelName}`, () => types.reference(
     getItemModel(modelName),
     {
       get(pk) {
         const store = getStore()
         return store[modelName].items.getWithProxy(pk, getStore())
       },
-      set(value, parent) {
-        console.log(value, parent)
-        // TODO this method don't called now. Maybe realization incorrect
-        return value
+      set(value) {
+        return value.pk
       },
     }
   ))
+}
+
+const getFkModelNamesFromType = (type, regexp, apiName) => {
+  if (typeof type !== 'string') return undefined
+  const matches = type.match(regexp)
+  if (!matches) return undefined
+  return matches[1].split(',').map(match => {
+    return match.includes(':') ? match.trim().replace(':', '_') : `${apiName}_${match.trim()}`
+  })
 }
 
 const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemModel) => {
@@ -33,26 +40,22 @@ const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemMo
     return types.maybeNull(types[fieldType])
   }
 
-  const fkMatch = fieldType.match(fkRegex)
-  if (fkMatch) {
-    let fkModelName = fkMatch[1]
-    if (fkModelName.includes(':')) {
-      fkModelName = fkModelName.replace(':', '_')
-    } else {
-      fkModelName = `${apiName}_${fkModelName}`
-    }
-    return types.maybeNull(getFkType(fkModelName, getStore, getItemModel))
+  const fkModelNames = getFkModelNamesFromType(fieldType, fkRegex, apiName)
+  if (fkModelNames) {
+    return types.union(
+      types.null,
+      types.undefined,
+      ...fkModelNames.map(modelName => getFkType(modelName, getStore, getItemModel))
+    )
   }
 
-  const fkArrayMatch = fieldType.match(fkArrayRegex)
-  if (fkArrayMatch) {
-    let fkModelName = fkArrayMatch[1]
-    if (fkModelName.includes(':')) {
-      fkModelName = fkModelName.replace(':', '_')
-    } else {
-      fkModelName = `${apiName}_${fkModelName}`
-    }
-    return types.maybeNull(types.array(getFkType(fkModelName, getStore, getItemModel)))
+  const fkArrayModelNames = getFkModelNamesFromType(fieldType, fkArrayRegex, apiName)
+  if (fkArrayModelNames) {
+    return types.maybeNull(types.array(types.union(
+      types.null,
+      types.undefined,
+      ...fkArrayModelNames.map(modelName => getFkType(modelName, getStore, getItemModel))
+    )))
   }
 
   return types.maybeNull(types.frozen())
@@ -66,6 +69,7 @@ export default (apiName, apiModelName, apiModelPk, apiModelFields, getStore, get
       [field]: parseFieldType(apiName, fieldType, field === apiModelPk, getStore, getItemModel),
     }
   }, {
+    $modelName: apiModelName,
     $loading: false,
     $loadedById: false,
     $error: 0,
@@ -75,49 +79,6 @@ export default (apiName, apiModelName, apiModelPk, apiModelFields, getStore, get
     .views(self => ({
       get pk() {
         return self[apiModelPk]
-      },
-      getFieldType(field) {
-        const fieldType = apiModelFields[field]
-
-        if (!fieldType) {
-          return { isSimple: true }
-        }
-
-        const fkMatch = fieldType.match(fkRegex)
-        if (fkMatch) {
-          let fkModelName = fkMatch[1]
-          if (fkModelName.includes(':')) {
-            fkModelName = fkModelName.replace(':', '_')
-          } else {
-            fkModelName = `${apiName}_${fkModelName}`
-          }
-          return {
-            type: getItemModel(fkModelName),
-            isReference: true,
-          }
-        }
-
-        const fkArrayMatch = fieldType.match(fkArrayRegex)
-        if (fkArrayMatch) {
-          let fkModelName = fkArrayMatch[1]
-          if (fkModelName.includes(':')) {
-            fkModelName = fkModelName.replace(':', '_')
-          } else {
-            fkModelName = `${apiName}_${fkModelName}`
-          }
-          return {
-            type: getItemModel(fkModelName),
-            isReference: true,
-            isArray: true,
-          }
-        }
-
-        return {
-          type: fieldType,
-          isSimple: true,
-          isIdentifier: field === apiModelPk,
-          isArray: fieldType === 'array',
-        }
       },
     }))
 }
