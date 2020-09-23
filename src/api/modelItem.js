@@ -36,7 +36,7 @@ const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemMo
     return types.identifier
   }
 
-  if (types[fieldType]) {
+  if (typeof types[fieldType] === 'object') {
     return types.maybeNull(types[fieldType])
   }
 
