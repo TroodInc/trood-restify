@@ -4,7 +4,7 @@ export const defaultHeaders = {
 
 export const defaultAllowNoTokenEndpoints = /.*/
 
-export const defaultPaginationTemplate = 'q=limit({offset},{pageSize})'
+export const defaultPaginationTemplate = 'limit={pageSize}&offset={offset}'
 
 export const RESPONSE_FORMATS = {
   'json': 'json',
@@ -13,3 +13,5 @@ export const RESPONSE_FORMATS = {
   'formData': 'formData',
   'arrayBuffer': 'arrayBuffer',
 }
+
+export const defaultGenericTypeAddress = '_object'

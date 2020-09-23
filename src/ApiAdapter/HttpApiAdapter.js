@@ -126,7 +126,7 @@ class HttpApiAdapter {
 
     if (pageSize) {
       const offset = page * pageSize
-      const paginationString = templateApplyValues(this.paginationTemplate, { page, pageSize, offset })
+      const paginationString = templateApplyValues(this.paginationTemplate, { pageNumber: page, pageSize, offset })
       const tmpUrl = new URL('http://trood.com')
       tmpUrl.search = paginationString
       for (let key of tmpUrl.searchParams.keys()) {
