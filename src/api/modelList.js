@@ -63,19 +63,15 @@ export default (
               const value = target[prop]
               const propType = Item.properties[prop]
               if (!propType) return value
-              const isArray = isArrayType(propType)
               if (
                 Object.prototype.hasOwnProperty.call(target, prop) &&
-                (value === null || value === undefined || (
-                  isArray && !value.length
-                ))
+                (value === null || value === undefined)
               ) {
                 if (!target.$loading && !target.$loadedById) {
                   modelStore.getByPk(target.pk)
                 }
-                if (isArray) return []
               }
-              return target[prop]
+              return value
             },
           })
         },

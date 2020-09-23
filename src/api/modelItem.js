@@ -51,11 +51,11 @@ const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemMo
 
   const fkArrayModelNames = getFkModelNamesFromType(fieldType, fkArrayRegex, apiName)
   if (fkArrayModelNames) {
-    return types.maybeNull(types.array(types.union(
+    return types.optional(types.array(types.union(
       types.null,
       types.undefined,
       ...fkArrayModelNames.map(modelName => getFkType(modelName, getStore, getItemModel))
-    )))
+    )), [])
   }
 
   return types.maybeNull(types.frozen())
