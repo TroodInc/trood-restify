@@ -116,8 +116,8 @@ it will be return value in Promise
 
 Store contains methods for specific objects
 
-in next `objStore = store.<objectName>`, where `<objectName>` is `<apiName>_<object>`.
-example: `store.myApi_object1`
+in next `objStore = store.apis.<apiName>.<objectName>`.
+example: `store.apis.myApi.object1`
 
 **`objStore.getByPk(<PK>, options<object>)`** - method return entity object.  
 You need use it in mobx observer

@@ -52,7 +52,7 @@ class HttpApiAdapter {
   }
 
   getItemGenericType(item) {
-    return `${this.apiName}_${get(item, this.genericTypeAddress)}`
+    return get(item, this.genericTypeAddress)
   }
 
   async getResponseData(response, format, pk) {

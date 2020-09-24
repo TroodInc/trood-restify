@@ -1,11 +1,11 @@
-declare function _default({ apiAdapter, apiModelName, apiModelPk, apiModelEndpoint, apiModelFields, }: {
+declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, modelFields, }: {
     apiAdapter: any;
-    apiModelName: any;
-    apiModelPk: any;
-    apiModelEndpoint: any;
-    apiModelFields: any;
+    modelName: any;
+    modelPk: any;
+    modelEndpoint: any;
+    modelFields: any;
 }, getStore: any, getItemModel: any, setItemModel: any): import("mobx-state-tree").IModelType<{
-    apiModelName: import("mobx-state-tree").ISimpleType<string>;
+    modelName: import("mobx-state-tree").ISimpleType<string>;
     items: import("mobx-state-tree").IMapType<import("mobx-state-tree").IModelType<{
         $modelName: any;
         $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;

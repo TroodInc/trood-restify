@@ -1,4 +1,4 @@
-declare function _default(apiName: any, apiModelName: any, apiModelPk: any, apiModelFields: any, getStore: any, getItemModel: any): import("mobx-state-tree").IModelType<{
+declare function _default(apiName: any, modelName: any, modelPk: any, modelFields: any, getStore: any, getItemModel: any): import("mobx-state-tree").IModelType<{
     $modelName: any;
     $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
     $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;

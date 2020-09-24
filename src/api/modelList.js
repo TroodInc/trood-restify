@@ -11,7 +11,7 @@ const getJsonCopyByPk = (items, pk) => {
 
 const getReferences = type => {
   if (!type) return undefined
-  const matches = Array.from((type.name || '').matchAll(/lateRef:([\w]*)/g))
+  const matches = Array.from((type.name || '').matchAll(/lateRef\(([\w:]*)\)/g))
     .map(match => match[1])
   if (matches.length) return matches
   return undefined
@@ -20,19 +20,19 @@ const getReferences = type => {
 export default (
   {
     apiAdapter,
-    apiModelName,
-    apiModelPk,
-    apiModelEndpoint,
-    apiModelFields,
+    modelName,
+    modelPk,
+    modelEndpoint,
+    modelFields,
   },
   getStore,
   getItemModel,
   setItemModel,
 ) => {
-  const Item = modelItem(apiAdapter.apiName, apiModelName, apiModelPk, apiModelFields, getStore, getItemModel)
-  setItemModel(apiModelName, Item)
+  const Item = modelItem(apiAdapter.apiName, modelName, modelPk, modelFields, getStore, getItemModel)
+  setItemModel(apiAdapter.apiName, modelName, Item)
 
-  const ItemPage = types.model(`${apiModelName}_page`, {
+  const ItemPage = types.model(`${modelName}_page`, {
     page: types.identifierNumber,
     items: types.map(types.reference(Item)),
     $loading: false,
@@ -40,24 +40,24 @@ export default (
     $errorData: types.maybeNull(types.frozen()),
   })
 
-  const ItemPages = types.model(`${apiModelName}_pages`, {
+  const ItemPages = types.model(`${modelName}_pages`, {
     pageSize: types.identifierNumber,
     pages: types.map(ItemPage),
   })
 
-  const ItemMap = types.model(`${apiModelName}_map`, {
+  const ItemMap = types.model(`${modelName}_map`, {
     url: types.identifier,
     count: types.number,
     pageSizes: types.map(ItemPages),
   })
 
-  return types.model(`${apiModelName}_list`, {
-    apiModelName: types.identifier,
+  return types.model(`${modelName}_list`, {
+    modelName: types.identifier,
     items: types.map(Item)
       .hooks(self => ({
         getWithProxy(key, store) {
           const item = self.get(key)
-          const modelStore = store[Item.name]
+          const modelStore = store.apis[apiAdapter.apiName][Item.name]
           return new Proxy(item, {
             get(target, prop) {
               const value = target[prop]
@@ -81,7 +81,7 @@ export default (
     .views(self => ({
       asyncGetByPk(pk, options = {}) {
         self.createItem(pk)
-        return apiAdapter.callGet(apiModelEndpoint, { ...options, pk }, () => {
+        return apiAdapter.callGet(modelEndpoint, { ...options, pk }, () => {
           self.setItemLoading(pk, true)
         })
           .then(({ status, error, data }) => {
@@ -106,9 +106,9 @@ export default (
         return self.items.getWithProxy(pk, getStore()) || {}
       },
       asyncGetPage(page = 0, pageSize = 0, options = {}) {
-        const url = apiAdapter.getUrl(apiModelEndpoint, options)
+        const url = apiAdapter.getUrl(modelEndpoint, options)
         self.createList(url, page, pageSize)
-        return apiAdapter.callGet(apiModelEndpoint, { ...options, page, pageSize })
+        return apiAdapter.callGet(modelEndpoint, { ...options, page, pageSize })
           .then(resp => {
             if (resp.status) {
               self.createList(url, page, pageSize, resp)
@@ -119,7 +119,7 @@ export default (
           })
       },
       getPage(page = 0, pageSize = 0, options = {}) {
-        const url = apiAdapter.getUrl(apiModelEndpoint, options)
+        const url = apiAdapter.getUrl(modelEndpoint, options)
         self.asyncGetPage(page, pageSize, options)
         const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
         if (!pageItem) return []
@@ -127,7 +127,7 @@ export default (
       },
       getInfinityPages(pageSize = 0, options = {}) {
         let page = 0
-        const url = apiAdapter.getUrl(apiModelEndpoint, options)
+        const url = apiAdapter.getUrl(modelEndpoint, options)
         if (
           !(self.lists.has(url) &&
           self.lists.get(url).pageSizes.has(pageSize) &&
@@ -146,7 +146,7 @@ export default (
       },
       getInfinityNextPageNumber(pageSize = 0, options = {}) {
         let page = 0
-        const url = apiAdapter.getUrl(apiModelEndpoint, options)
+        const url = apiAdapter.getUrl(modelEndpoint, options)
         const { count, pageSizes } = self.lists.get(url)
         const { pages } = pageSizes.get(pageSize)
         while (pages.has(page)) {
@@ -180,19 +180,32 @@ export default (
               const store = getStore()
               if (isArrayType(keyType)) {
                 if (references.length === 1) {
-                  normalizedData[key] = data[key].map(item => store[references[0]].createItem(item))
+                  const ref = references[0].split(':')
+                  normalizedData[key] = data[key]
+                    .map(item => store.apis[ref[0]][ref[1]].createItem(item))
                 } else {
                   normalizedData[key] = data[key].map(item => {
                     const genericModel = apiAdapter.getItemGenericType(item)
-                    return store[genericModel].createItem(item)
+                    const ref = genericModel.split(':')
+                    if (ref.length === 1) {
+                      ref.push(ref[0])
+                      ref[0] = apiAdapter.apiName
+                    }
+                    return store.apis[ref[0]][ref[1]].createItem(item)
                   })
                 }
               } else {
                 if (references.length === 1) {
-                  normalizedData[key] = store[references].createItem(data[key])
+                  const ref = references[0].split(':')
+                  normalizedData[key] = store.apis[ref[0]][ref[1]].createItem(data[key])
                 } else {
                   const genericModel = apiAdapter.getItemGenericType(data[key])
-                  normalizedData[key] = store[genericModel].createItem(data[key])
+                  const ref = genericModel.split(':')
+                  if (ref.length === 1) {
+                    ref.push(ref[0])
+                    ref[0] = apiAdapter.apiName
+                  }
+                  normalizedData[key] = store.apis[ref[0]][ref[1]].createItem(data[key])
                 }
               }
             } else {

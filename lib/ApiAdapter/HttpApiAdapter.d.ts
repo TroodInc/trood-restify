@@ -33,7 +33,7 @@ declare class HttpApiAdapter {
     arrayDataAddress: any;
     arrayErrorAddress: any;
     arrayCountAddress: any;
-    getItemGenericType(item: any): string;
+    getItemGenericType(item: any): any;
     getResponseData(response: any, format: any, pk: any): Promise<{
         status: number;
         error: {

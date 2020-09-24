@@ -4,13 +4,13 @@ import { types } from 'mobx-state-tree'
 const fkRegex = /fk\((.*)\)/
 const fkArrayRegex = /fk_array\((.*)\)/
 
-const getFkType = (modelName, getStore, getItemModel) => {
-  return types.late(`lateRef:${modelName}`, () => types.reference(
-    getItemModel(modelName),
+const getFkType = (apiName, modelName, getStore, getItemModel) => {
+  return types.late(`lateRef(${apiName}:${modelName})`, () => types.reference(
+    getItemModel(apiName, modelName),
     {
       get(pk) {
         const store = getStore()
-        return store[modelName].items.getWithProxy(pk, getStore())
+        return store.apis[apiName][modelName].items.getWithProxy(pk, getStore())
       },
       set(value) {
         return value.pk
@@ -24,7 +24,11 @@ const getFkModelNamesFromType = (type, regexp, apiName) => {
   const matches = type.match(regexp)
   if (!matches) return undefined
   return matches[1].split(',').map(match => {
-    return match.includes(':') ? match.trim().replace(':', '_') : `${apiName}_${match.trim()}`
+    const normalize = (match.includes(':') ? match.trim() : `${apiName}:${match.trim()}`).split(':')
+    return {
+      apiName: normalize[0],
+      modelName: normalize[1],
+    }
   })
 }
 
@@ -45,7 +49,7 @@ const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemMo
     return types.union(
       types.null,
       types.undefined,
-      ...fkModelNames.map(modelName => getFkType(modelName, getStore, getItemModel))
+      ...fkModelNames.map(model => getFkType(model.apiName, model.modelName, getStore, getItemModel))
     )
   }
 
@@ -54,31 +58,31 @@ const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemMo
     return types.optional(types.array(types.union(
       types.null,
       types.undefined,
-      ...fkArrayModelNames.map(modelName => getFkType(modelName, getStore, getItemModel))
+      ...fkArrayModelNames.map(model => getFkType(model.apiName, model.modelName, getStore, getItemModel))
     )), [])
   }
 
   return types.maybeNull(types.frozen())
 }
 
-export default (apiName, apiModelName, apiModelPk, apiModelFields, getStore, getItemModel) => {
-  const fields = Object.keys(apiModelFields).reduce((memo, field) => {
-    const fieldType = apiModelFields[field]
+export default (apiName, modelName, modelPk, modelFields, getStore, getItemModel) => {
+  const fields = Object.keys(modelFields).reduce((memo, field) => {
+    const fieldType = modelFields[field]
     return {
       ...memo,
-      [field]: parseFieldType(apiName, fieldType, field === apiModelPk, getStore, getItemModel),
+      [field]: parseFieldType(apiName, fieldType, field === modelPk, getStore, getItemModel),
     }
   }, {
-    $modelName: apiModelName,
+    $modelName: modelName,
     $loading: false,
     $loadedById: false,
     $error: 0,
     $errorData: types.maybeNull(types.frozen()),
   })
-  return types.model(apiModelName, fields)
+  return types.model(modelName, fields)
     .views(self => ({
       get pk() {
-        return self[apiModelPk]
+        return self[modelPk]
       },
     }))
 }
