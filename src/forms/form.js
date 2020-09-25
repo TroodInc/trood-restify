@@ -1,5 +1,6 @@
 import { types } from 'mobx-state-tree'
 
+import cloneDeep from 'lodash/cloneDeep'
 import get from 'lodash/get'
 import set from 'lodash/set'
 
@@ -18,7 +19,7 @@ const hasErrors = errors => {
 }
 
 const changeData = (oldData, nextData) => {
-  const data = Array.isArray(oldData) ? [ ...Object.values(oldData) ] : { ...oldData }
+  const data = cloneDeep(oldData)
   Object.keys(nextData).forEach(key => {
     const nextValue = get(nextData, key)
     if (typeof nextValue === 'object' && nextValue !== null) {
