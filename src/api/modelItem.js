@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree'
+import { types, getSnapshot } from 'mobx-state-tree'
 
 
 const fkRegex = /fk\((.*)\)/
@@ -10,7 +10,7 @@ const getFkType = (apiName, modelName, getStore, getItemModel) => {
     {
       get(pk) {
         const store = getStore()
-        return store.apis[apiName][modelName].items.getWithProxy(pk, getStore())
+        return store[apiName][modelName].items.getWithProxy(pk, getStore())
       },
       set(value) {
         return value.pk
@@ -83,6 +83,16 @@ export default (apiName, modelName, modelPk, modelFields, getStore, getItemModel
     .views(self => ({
       get pk() {
         return self[modelPk]
+      },
+      get modelData() {
+        const snapshot = getSnapshot(self)
+        return Object.keys(snapshot).reduce((memo, key) => {
+          if (/^\$/.test(key)) return memo
+          return {
+            ...memo,
+            [key]: snapshot[key],
+          }
+        }, {})
       },
     }))
 }

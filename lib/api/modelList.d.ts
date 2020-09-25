@@ -14,6 +14,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
     }, {
         readonly pk: any;
+        readonly modelData: {};
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
     lists: import("mobx-state-tree").IMapType<import("mobx-state-tree").IModelType<{
         url: import("mobx-state-tree").ISimpleType<string>;
@@ -30,6 +31,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
                     $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
                 }, {
                     readonly pk: any;
+                    readonly modelData: {};
                 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>>;
                 $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
                 $error: import("mobx-state-tree").IType<number | undefined, number, number>;
@@ -49,6 +51,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $errorData: any;
     } & import("mobx-state-tree/dist/internal").NonEmptyObject & {
         readonly pk: any;
+        readonly modelData: {};
     } & import("mobx-state-tree").IStateTreeNode<import("mobx-state-tree").IReferenceType<import("mobx-state-tree").IModelType<{
         $modelName: any;
         $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
@@ -57,6 +60,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
     }, {
         readonly pk: any;
+        readonly modelData: {};
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>>)[];
     getInfinityPages(pageSize?: number, options?: {}): any[];
     getInfinityNextPageNumber(pageSize?: number, options?: {}): number | undefined;
@@ -70,6 +74,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $errorData: any;
     } & import("mobx-state-tree/dist/internal").NonEmptyObject & {
         readonly pk: any;
+        readonly modelData: {};
     } & import("mobx-state-tree").IStateTreeNode<import("mobx-state-tree").IModelType<{
         $modelName: any;
         $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
@@ -78,6 +83,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
     }, {
         readonly pk: any;
+        readonly modelData: {};
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>) | undefined;
     createList(url: any, page: number | undefined, pageSize: number | undefined, responseData: any): void;
     setItemLoading(pk: any, loading: any): void;

@@ -14,9 +14,8 @@ const setItemModel = (apiName, modelName, model) => {
 }
 
 export default (meta = {}, getToken) => {
-  if (!store.apis) store.apis = {}
   Object.keys(meta).forEach(apiName => {
-    if (!store.apis[apiName]) store.apis[apiName] = {}
+    if (!store[apiName]) store[apiName] = {}
     const apiConfig = meta[apiName]
     const apiAdapter = getHttpApiAdapter({
       ...apiConfig,
@@ -33,7 +32,7 @@ export default (meta = {}, getToken) => {
         modelFields: modelConfig.fields,
       }
       const list = ModelList(apiModelConfig, getStore, getItemModel, setItemModel)
-      store.apis[apiName][modelName] = list.create({ modelName })
+      store[apiName][modelName] = list.create({ modelName })
     })
   })
 

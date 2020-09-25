@@ -6,5 +6,6 @@ declare function _default(apiName: any, modelName: any, modelPk: any, modelField
     $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
 }, {
     readonly pk: any;
+    readonly modelData: {};
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>;
 export default _default;

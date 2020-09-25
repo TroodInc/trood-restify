@@ -57,7 +57,7 @@ export default (
       .hooks(self => ({
         getWithProxy(key, store) {
           const item = self.get(key)
-          const modelStore = store.apis[apiAdapter.apiName][Item.name]
+          const modelStore = store[apiAdapter.apiName][Item.name]
           return new Proxy(item, {
             get(target, prop) {
               const value = target[prop]
@@ -182,7 +182,7 @@ export default (
                 if (references.length === 1) {
                   const ref = references[0].split(':')
                   normalizedData[key] = data[key]
-                    .map(item => store.apis[ref[0]][ref[1]].createItem(item))
+                    .map(item => store[ref[0]][ref[1]].createItem(item))
                 } else {
                   normalizedData[key] = data[key].map(item => {
                     const genericModel = apiAdapter.getItemGenericType(item)
@@ -191,13 +191,13 @@ export default (
                       ref.push(ref[0])
                       ref[0] = apiAdapter.apiName
                     }
-                    return store.apis[ref[0]][ref[1]].createItem(item)
+                    return store[ref[0]][ref[1]].createItem(item)
                   })
                 }
               } else {
                 if (references.length === 1) {
                   const ref = references[0].split(':')
-                  normalizedData[key] = store.apis[ref[0]][ref[1]].createItem(data[key])
+                  normalizedData[key] = store[ref[0]][ref[1]].createItem(data[key])
                 } else {
                   const genericModel = apiAdapter.getItemGenericType(data[key])
                   const ref = genericModel.split(':')
@@ -205,7 +205,7 @@ export default (
                     ref.push(ref[0])
                     ref[0] = apiAdapter.apiName
                   }
-                  normalizedData[key] = store.apis[ref[0]][ref[1]].createItem(data[key])
+                  normalizedData[key] = store[ref[0]][ref[1]].createItem(data[key])
                 }
               }
             } else {
