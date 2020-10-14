@@ -65,11 +65,12 @@ export default (
               if (!propType) return value
               if (
                 Object.prototype.hasOwnProperty.call(target, prop) &&
-                (value === null || value === undefined)
+                (value === null || value === undefined) &&
+                !target.$loading &&
+                !target.$loadedById &&
+                !target.$error
               ) {
-                if (!target.$loading && !target.$loadedById) {
                   modelStore.getByPk(target.pk)
-                }
               }
               return value
             },
@@ -80,8 +81,12 @@ export default (
   })
     .views(self => ({
       asyncGetByPk(pk, options = {}) {
+        const item = self.items.get(pk) || {}
+        if (item.$error) {
+          return Promise.resolve(() => self.items.getWithProxy(pk, getStore()) || {})
+        }
         self.createItem(pk)
-        return apiAdapter.callGet(modelEndpoint, { ...options, pk }, () => {
+        return apiAdapter.GET(modelEndpoint, { ...options, pk }, () => {
           self.setItemLoading(pk, true)
         })
           .then(({ status, error, data }) => {
@@ -92,7 +97,7 @@ export default (
                 self.createItem({
                   ...data,
                   $loading: false,
-                  $loadedById: !options.filters,
+                  $loadedById: !options.filters || item.$loadedById,
                   $error: 0,
                   $errorData: null,
                 })
@@ -108,7 +113,7 @@ export default (
       asyncGetPage(page = 0, pageSize = 0, options = {}) {
         const url = apiAdapter.getUrl(modelEndpoint, options)
         self.createList(url, page, pageSize)
-        return apiAdapter.callGet(modelEndpoint, { ...options, page, pageSize })
+        return apiAdapter.GET(modelEndpoint, { ...options, page, pageSize })
           .then(resp => {
             if (resp.status) {
               self.createList(url, page, pageSize, resp)
@@ -310,6 +315,27 @@ export default (
           $error: error,
           $errorData: errorData,
         })
+      },
+      upsert(pk, body, options = {}) {
+        let method = (options.method || '').toUpperCase()
+        if (!method) {
+          method = pk ? 'PATCH' : 'POST'
+        }
+        apiAdapter[method](options.endpoint || modelEndpoint, { ...options, pk, body })
+          .then(({ status, error, data }) => {
+            if (status) {
+              if (error) {
+                if (pk) self.setItemError(pk, status, error)
+              } else {
+                self.createItem({
+                  ...data,
+                  $loading: false,
+                  $error: 0,
+                  $errorData: null,
+                })
+              }
+            }
+          })
       },
     }))
 }

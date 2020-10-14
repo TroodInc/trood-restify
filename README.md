@@ -112,7 +112,7 @@ function that return value for Authorization http header
 it will be return value in Promise
 
 
-### Store methods
+### API Store methods
 
 Store contains methods for specific objects
 
@@ -153,12 +153,91 @@ method initialize request for load page with pageSize and pageNumber returned fr
 ***options in all method**
 ```
 {
-  "headers": <object>, // same as headers in API config; added or replaced api headers
-  "hash": <sthing>, // http request hash parameter
-  "cacheMaxAgeMs": <number>, // cache life time; default 1 min (60 * 1000)
-  "filters": <string|object>, // http request argumest;
+  headers: <object>, // same as headers in API config; added or replaced api headers
+  hash: <sthing>, // http request hash parameter
+  cacheMaxAgeMs: <number>, // cache life time; default 1 min (60 * 1000)
+  filters: <string|object>, // http request arguments;
   // you can use args for pagination in whis place, but it not recomended
 }
 ```
 
 ***functions parameters pageSize, options.filters and options.hash - is identify group of pages**
+
+### Forms Store methods
+
+#### getForm
+**`
+store.forms.getForm({
+  apiName,
+  modelName,
+  modelPk,
+  formName,
+  values
+})
+`** - method return form object.  
+For edit/create entity from **API Store** you must pass modelPk(only for edit), apiName, modelName  
+
+*Example:*
+```
+const form = store.forms.getForm({
+  apiName: 'apiName1',
+  modelName: 'object_name_1',
+  modelPk: 1
+})
+```  
+`formName` - specify name of form in store (is required for form without apiName, modelName)  
+`values` - object with values for form.data initialize (if you edit entity, it was replaced entity values)  
+  
+`store.forms.asyncGetForm` - same as getForm, but form objec return in Promise
+
+#### form options
+
+**`form.data`** - object with form values  
+**`form.errors`** - object with form errors  
+**`form.hasErrors`** - true if form.errors include string|number|boolean<true> value  
+
+#### form methods
+
+**`form.changeFields(values)`** - change values in form.data.  
+*values* - object with values for change  
+
+*Example:*
+```
+// form.data === {}
+
+form.changeFields({
+  field1: 'field1',
+  field2: {
+    field3: 'field3'
+  },
+  'field4.field5.field6': 'field6
+})
+
+// form.data === {
+  field1: 'field1',
+  field2: {
+    field3: 'field3'
+  },
+  field4: {
+    field5: {
+      field6: 'field6
+    }
+  }
+}
+```
+
+**`form.changeFieldsErrors(values)`** - same as form.changeFields? but change form.errors.  
+
+**`form.submit(options, remove)`** - start http request with `body = form.data`  
+```
+options: {
+  method: <POST|PATCH|DELETE|GET>,  
+  // specify http method (default PATCH if form create with pk or POST if not)
+  endpoint: <string>, // specify endpoint if standart does not match
+  headers: <object>, // same as headers in API config; added or replaced api headers
+  filters: <string|object>, // http request arguments
+}
+remove - <boolean> if true: form will be removed after submit
+```
+
+**`form.remove()`** - remove current form

@@ -252,15 +252,15 @@ class HttpApiAdapter {
     return responseData
   }
 
-  callGet = (endpoint, options = {}, ...other) =>
+  GET = (endpoint, options = {}, ...other) =>
     this.callApi(endpoint, { ...options, method: 'GET', body: undefined }, ...other)
-  callPost = (endpoint, options = {}, ...other) =>
+  POST = (endpoint, options = {}, ...other) =>
     this.callApi(endpoint, { ...options, method: 'POST' }, ...other)
-  callPut = (endpoint, options = {}, ...other) =>
+  PUT = (endpoint, options = {}, ...other) =>
     this.callApi(endpoint, { ...options, method: 'PUT' }, ...other)
-  callPatch = (endpoint, options = {}, ...other) =>
+  PATCH = (endpoint, options = {}, ...other) =>
     this.callApi(endpoint, { ...options, method: 'PATCH' }, ...other)
-  callDelete = (endpoint, options = {}, ...other) =>
+  DELETE = (endpoint, options = {}, ...other) =>
     this.callApi(endpoint, { ...options, method: 'DELETE' }, ...other)
 }
 

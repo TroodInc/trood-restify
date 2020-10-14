@@ -1,10 +1,14 @@
-import { types } from 'mobx-state-tree'
+import { types, destroy } from 'mobx-state-tree'
 
-import Form, { emptyForm } from './form'
+import getForm, { emptyForm } from './form'
 
 
 const getForms = (apisStore) => types.model(`forms`, {
-  forms: types.map(Form)
+  forms: types.map(types.union({
+    dispatcher: snapshot => {
+      return getForm(snapshot.$apiName, snapshot.$modelName, apisStore)
+    },
+  })),
 })
   .views(self => ({
     getFormName({
@@ -91,18 +95,33 @@ const getForms = (apisStore) => types.model(`forms`, {
                 ...model.modelData,
                 ...values,
               }
-              self.setForm(formName, { name: formName, data })
+              self.setForm(formName, {
+                name: formName,
+                $apiName: apiName,
+                $modelName: modelName,
+                $pk: modelPk,
+                data,
+              })
               resolve(self.forms.get(formName))
             })
         } else {
           const data = values
-          self.setForm(formName, { name: formName, data })
+          self.setForm(formName, {
+            name: formName,
+            $apiName: apiName,
+            $modelName: modelName,
+            $pk: modelPk,
+            data,
+          })
           resolve(self.forms.get(formName))
         }
       })
     },
     setForm(formName, data) {
       self.forms.set(formName, data)
+    },
+    removeItem(item) {
+      destroy(item)
     },
   }))
 

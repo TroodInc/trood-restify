@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree'
+import { types, getParent } from 'mobx-state-tree'
 
 import cloneDeep from 'lodash/cloneDeep'
 import get from 'lodash/get'
@@ -10,7 +10,7 @@ const hasErrors = errors => {
   if (typeof errors === 'object') {
     return Object.keys(errors).reduce((memo, key) => {
       const error = errors[key]
-      if (error === undefined || error === null) return memo || false
+      if (error === undefined || error === null || error === false) return memo || false
       if (typeof error === 'object') return memo || hasErrors(error)
       return true
     }, false)
@@ -41,15 +41,18 @@ export const emptyForm = {
   hasErrors: false,
 }
 
-export default types.model(`form`, {
+const MainForm = types.model(`form`, {
   name: types.identifier,
+  $apiName: 'default',
+  $modelName: 'default',
+  $pk: types.union(types.number, types.string, types.null, types.undefined),
   data: types.optional(types.frozen(), {}),
   errors: types.optional(types.frozen(), {}),
 })
   .views(self => ({
     get hasErrors() {
       return hasErrors(self.errors)
-    }
+    },
   }))
   .actions(self => ({
     changeFields(values) {
@@ -58,4 +61,28 @@ export default types.model(`form`, {
     changeFieldsErrors(errors) {
       self.errors = changeData(self.errors, errors)
     },
+    remove() {
+      getParent(self, 2).removeItem(self)
+    },
   }))
+
+const formsModels = {}
+
+export default (apiName = 'default', modelName = 'default', apisStore) => {
+  let formModel = get(formsModels, [apiName, modelName])
+  if (formModel) return formModel
+
+  const modelStore = apisStore[apiName][modelName]
+  formModel = MainForm.extend(self => ({
+    actions: {
+      submit(options, remove = false) {
+        modelStore.upsert(self.$pk, JSON.stringify(self.data), options)
+        if (remove) self.remove()
+      },
+    },
+  }))
+
+  set(formsModels, [apiName, modelName], formModel)
+
+  return formModel
+}
