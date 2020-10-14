@@ -88,5 +88,6 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
     createList(url: any, page: number | undefined, pageSize: number | undefined, responseData: any): void;
     setItemLoading(pk: any, loading: any): void;
     setItemError(pk: any, error: any, errorData: any): void;
+    upsert(pk: any, body: any, options?: {}): void;
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>;
 export default _default;
