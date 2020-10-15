@@ -200,7 +200,7 @@ const form = store.forms.getForm({
 })
 ```  
 `formName` - specify name of form in store (is required for form without apiName, modelName)  
-`values` - object with values for form.data initialize (if you edit entity, it was replaced entity values)
+`values` - object with values for form.data initialize (if you edit entity, it was replaced entity values)  
 **forms without apiName and modelName will be use defaultAPI**  
   
 `store.forms.asyncGetForm` - same as getForm, but form objec return in Promise
