@@ -322,7 +322,8 @@ export default (
           method = pk ? 'PATCH' : 'POST'
         }
         apiAdapter[method](options.endpoint || modelEndpoint, { ...options, pk, body })
-          .then(({ status, error, data }) => {
+          .then(resp => {
+            const { status, error, data } = resp
             if (status) {
               if (error) {
                 if (pk) self.setItemError(pk, status, error)
@@ -335,6 +336,7 @@ export default (
                 })
               }
             }
+            return resp
           })
       },
     }))

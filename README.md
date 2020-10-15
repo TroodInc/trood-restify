@@ -114,6 +114,20 @@ it will be return value in Promise
 
 ### API Store methods
 
+#### Default API
+
+By default trood-restify create default API in address `defApi = store.apis.default.default`
+
+Default API only can get and store data (same as in response)
+
+**`defApi.getData(endpoint<string>, options<object>)`** - method return response from endpoint.  
+You need use it in mobx observer
+
+**`defApi.asyncGetData(endpoint<string>, options<object>)`** - same as getData, but response return in Promise
+
+
+#### Configured API
+
 Store contains methods for specific objects
 
 in next `objStore = store.apis.<apiName>.<objectName>`.
@@ -186,7 +200,8 @@ const form = store.forms.getForm({
 })
 ```  
 `formName` - specify name of form in store (is required for form without apiName, modelName)  
-`values` - object with values for form.data initialize (if you edit entity, it was replaced entity values)  
+`values` - object with values for form.data initialize (if you edit entity, it was replaced entity values)
+**forms without apiName and modelName will be use defaultAPI**  
   
 `store.forms.asyncGetForm` - same as getForm, but form objec return in Promise
 
@@ -231,9 +246,11 @@ form.changeFields({
 **`form.submit(options, remove)`** - start http request with `body = form.data`  
 ```
 options: {
+  endpoint: <string>, // specify endpoint if standart does not match
+  // its required for form without apiName and modelName
   method: <POST|PATCH|DELETE|GET>,  
   // specify http method (default PATCH if form create with pk or POST if not)
-  endpoint: <string>, // specify endpoint if standart does not match
+  // its required for form without apiName and modelName
   headers: <object>, // same as headers in API config; added or replaced api headers
   filters: <string|object>, // http request arguments
 }

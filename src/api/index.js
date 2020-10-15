@@ -1,6 +1,7 @@
 import getHttpApiAdapter from '../ApiAdapter'
 
 import ModelList from './modelList'
+import getDefaultApi from './defaultApi'
 
 
 const registeredItemModels = {}
@@ -35,6 +36,14 @@ export default (meta = {}, getToken) => {
       store[apiName][modelName] = list.create({ modelName })
     })
   })
+
+  const apiAdapter = getHttpApiAdapter({
+    apiName: 'default',
+    getToken,
+  })
+  store.default = {
+    default: getDefaultApi(apiAdapter).create({ modelName: 'default' }),
+  }
 
   return store
 }
