@@ -133,21 +133,23 @@ Store contains methods for specific objects
 in next `objStore = store.apis.<apiName>.<objectName>`.
 example: `store.apis.myApi.object1`
 
-**`objStore.getByPk(<PK>, options<object>)`** - method return entity object.  
+**`objStore.getByPk(<PK>, options<object>, includeDeleted<bool>)`** - method return entity object.  
 You need use it in mobx observer
 
-**`objStore.asyncGetByPk(<PK>, options<object>)`** - same as getByPk, but object return in Promise
+**`objStore.asyncGetByPk(<PK>, options<object>, includeDeleted<bool>)`** - same as getByPk, but object return in Promise
 
-**`objStore.getPage(page<number>, pageSize<number>, options<object>)`** -
+**`objStore.deleteByPk(<PK>, options<object>)`** - send DELETE request to backend and set $deleted = true to entity in store
+
+**`objStore.getPage(page<number>, pageSize<number>, options<object>, includeDeleted<bool>)`** -
 method return entities array from specific page.  
 It use in classic pagination case.  
 If page and pageSize is zero or undefined - http request sending without pagination params.  
 You need use it in mobx observer
 
-**`objStore.asyncPage(page<number>, pageSize<number>, options<object>)`** - same as getPage,
+**`objStore.asyncPage(page<number>, pageSize<number>, options<object>, includeDeleted<bool>)`** - same as getPage,
 but entity array return in Promise
 
-**`objStore.getInfinityPages(pageSize<number>, options<object>)`** -
+**`objStore.getInfinityPages(pageSize<number>, options<object>, includeDeleted<bool>)`** -
 method return entities array from all loaded pages.  
 Its use in infinity scroll pagination case.  
 If you have loaded pages with number 0,1,2,5,6 - getInfinityPages return entities only from pages 0,1,2  
@@ -174,6 +176,7 @@ method initialize request for load page with pageSize and pageNumber returned fr
   // you can use args for pagination in whis place, but it not recomended
 }
 ```
+***includeDeleted in all method** - if true - method return entity with $deleted = true
 
 ***functions parameters pageSize, options.filters and options.hash - is identify group of pages**
 
@@ -203,7 +206,7 @@ const form = store.forms.getForm({
 `values` - object with values for form.data initialize (if you edit entity, it was replaced entity values)  
 **forms without apiName and modelName will be use defaultAPI**  
   
-`store.forms.asyncGetForm` - same as getForm, but form objec return in Promise
+`store.forms.asyncGetForm` - same as getForm, but form object return in Promise
 
 #### form options
 

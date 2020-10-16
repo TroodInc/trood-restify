@@ -80,7 +80,7 @@ export default (
     lists: types.map(ItemMap),
   })
     .views(self => ({
-      asyncGetByPk(pk, options = {}) {
+      asyncGetByPk(pk, options = {}, includeDeleted = false) {
         const item = self.items.get(pk) || {}
         if (item.$error) {
           return Promise.resolve(() => self.items.getWithProxy(pk, getStore()) || {})
@@ -103,14 +103,18 @@ export default (
                 })
               }
             }
-            return self.items.getWithProxy(pk, getStore()) || {}
+            const result = self.items.getWithProxy(pk, getStore()) || {}
+            if (!includeDeleted || result.$deleted) return {}
+            return result
           })
       },
-      getByPk(pk, options = {}) {
+      getByPk(pk, options = {}, includeDeleted = false) {
         self.asyncGetByPk(pk, options)
-        return self.items.getWithProxy(pk, getStore()) || {}
+        const result = self.items.getWithProxy(pk, getStore()) || {}
+        if (!includeDeleted || result.$deleted) return {}
+        return result
       },
-      asyncGetPage(page = 0, pageSize = 0, options = {}) {
+      asyncGetPage(page = 0, pageSize = 0, options = {}, includeDeleted = false) {
         const url = apiAdapter.getUrl(modelEndpoint, options)
         self.createList(url, page, pageSize)
         return apiAdapter.GET(modelEndpoint, { ...options, page, pageSize })
@@ -121,16 +125,18 @@ export default (
             const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
             if (!pageItem) return []
             return Array.from(pageItem.items.values())
+              .filter(item => includeDeleted || !item.$deleted)
           })
       },
-      getPage(page = 0, pageSize = 0, options = {}) {
+      getPage(page = 0, pageSize = 0, options = {}, includeDeleted = false) {
         const url = apiAdapter.getUrl(modelEndpoint, options)
         self.asyncGetPage(page, pageSize, options)
         const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
         if (!pageItem) return []
         return Array.from(pageItem.items.values())
+          .filter(item => includeDeleted || !item.$deleted)
       },
-      getInfinityPages(pageSize = 0, options = {}) {
+      getInfinityPages(pageSize = 0, options = {}, includeDeleted = false) {
         let page = 0
         const url = apiAdapter.getUrl(modelEndpoint, options)
         if (
@@ -147,7 +153,7 @@ export default (
           page += 1
           pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
         }
-        return items
+        return items.filter(item => includeDeleted || !item.$deleted)
       },
       getInfinityNextPageNumber(pageSize = 0, options = {}) {
         let page = 0
@@ -310,11 +316,20 @@ export default (
       setItemError(pk, error, errorData) {
         const pkField = Item.identifierAttribute
         self.items.set(pk, {
+          ...self.items.get(pk),
           [pkField]: pk,
           $loading: false,
           $error: error,
           $errorData: errorData,
         })
+      },
+      setItemDeleted(pk) {
+        if (self.items.has(pk)) {
+          self.items.set(pk, {
+            ...self.items.get(pk),
+            $deleted: true,
+          })
+        }
       },
       upsert(pk, body, options = {}) {
         let method = (options.method || '').toUpperCase()
@@ -338,6 +353,10 @@ export default (
             }
             return resp
           })
+      },
+      deleteByPk(pk, options = {}) {
+        apiAdapter.DELETE(modelEndpoint, { ...options, pk })
+          .then(() => self.setItemDeleted(pk))
       },
     }))
 }

@@ -12,6 +12,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
         $error: import("mobx-state-tree").IType<number | undefined, number, number>;
         $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
+        $deleted: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
     }, {
         readonly pk: any;
         readonly modelData: {};
@@ -29,6 +30,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
                     $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
                     $error: import("mobx-state-tree").IType<number | undefined, number, number>;
                     $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
+                    $deleted: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
                 }, {
                     readonly pk: any;
                     readonly modelData: {};
@@ -40,15 +42,16 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         }, {}, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
     }, {}, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
 }, {
-    asyncGetByPk(pk: any, options?: {}): any;
-    getByPk(pk: any, options?: {}): any;
-    asyncGetPage(page?: number, pageSize?: number, options?: {}): any;
-    getPage(page?: number, pageSize?: number, options?: {}): ({
+    asyncGetByPk(pk: any, options?: {}, includeDeleted?: boolean): any;
+    getByPk(pk: any, options?: {}, includeDeleted?: boolean): any;
+    asyncGetPage(page?: number, pageSize?: number, options?: {}, includeDeleted?: boolean): any;
+    getPage(page?: number, pageSize?: number, options?: {}, includeDeleted?: boolean): ({
         $modelName: any;
         $loading: boolean;
         $loadedById: boolean;
         $error: number;
         $errorData: any;
+        $deleted: boolean;
     } & import("mobx-state-tree/dist/internal").NonEmptyObject & {
         readonly pk: any;
         readonly modelData: {};
@@ -58,11 +61,12 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
         $error: import("mobx-state-tree").IType<number | undefined, number, number>;
         $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
+        $deleted: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
     }, {
         readonly pk: any;
         readonly modelData: {};
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>>)[];
-    getInfinityPages(pageSize?: number, options?: {}): any[];
+    getInfinityPages(pageSize?: number, options?: {}, includeDeleted?: boolean): any[];
     getInfinityNextPageNumber(pageSize?: number, options?: {}): number | undefined;
     getInfinityNextPage(pageSize?: number, options?: {}): void;
 } & {
@@ -72,6 +76,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $loadedById: boolean;
         $error: number;
         $errorData: any;
+        $deleted: boolean;
     } & import("mobx-state-tree/dist/internal").NonEmptyObject & {
         readonly pk: any;
         readonly modelData: {};
@@ -81,6 +86,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
         $error: import("mobx-state-tree").IType<number | undefined, number, number>;
         $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
+        $deleted: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
     }, {
         readonly pk: any;
         readonly modelData: {};
@@ -88,6 +94,8 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
     createList(url: any, page: number | undefined, pageSize: number | undefined, responseData: any): void;
     setItemLoading(pk: any, loading: any): void;
     setItemError(pk: any, error: any, errorData: any): void;
+    setItemDeleted(pk: any): void;
     upsert(pk: any, body: any, options?: {}): void;
+    deleteByPk(pk: any, options?: {}): void;
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>;
 export default _default;

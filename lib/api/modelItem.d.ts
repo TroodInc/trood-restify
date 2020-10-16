@@ -4,6 +4,7 @@ declare function _default(apiName: any, modelName: any, modelPk: any, modelField
     $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
     $error: import("mobx-state-tree").IType<number | undefined, number, number>;
     $errorData: import("mobx-state-tree").IMaybeNull<import("mobx-state-tree").IType<any, any, any>>;
+    $deleted: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
 }, {
     readonly pk: any;
     readonly modelData: {};

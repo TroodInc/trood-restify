@@ -78,6 +78,7 @@ export default (apiName, modelName, modelPk, modelFields, getStore, getItemModel
     $loadedById: false,
     $error: 0,
     $errorData: types.maybeNull(types.frozen()),
+    $deleted: false,
   })
   return types.model(modelName, fields)
     .views(self => ({
