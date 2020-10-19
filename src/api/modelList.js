@@ -104,14 +104,14 @@ export default (
               }
             }
             const result = self.items.getWithProxy(pk, getStore()) || {}
-            if (!includeDeleted || result.$deleted) return {}
+            if (!includeDeleted && result.$deleted) return {}
             return result
           })
       },
       getByPk(pk, options = {}, includeDeleted = false) {
         self.asyncGetByPk(pk, options)
         const result = self.items.getWithProxy(pk, getStore()) || {}
-        if (!includeDeleted || result.$deleted) return {}
+        if (!includeDeleted && result.$deleted) return {}
         return result
       },
       asyncGetPage(page = 0, pageSize = 0, options = {}, includeDeleted = false) {
