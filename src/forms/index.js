@@ -1,6 +1,6 @@
 import { types, destroy } from 'mobx-state-tree'
 
-import getForm, { emptyForm } from './form'
+import getForm from './form'
 
 
 const getForms = (apisStore) => types.model(`forms`, {
@@ -52,7 +52,7 @@ const getForms = (apisStore) => types.model(`forms`, {
           values,
         })
       }
-      return form || emptyForm
+      return form
     },
     getForm({
       formName,
@@ -76,7 +76,7 @@ const getForms = (apisStore) => types.model(`forms`, {
           values,
         })
       }
-      return self.forms.get(name) || emptyForm
+      return self.forms.get(name)
     },
   }))
   .actions(self => ({
@@ -89,6 +89,13 @@ const getForms = (apisStore) => types.model(`forms`, {
     }) {
       return new Promise(resolve => {
         if (apiName && modelName && modelPk) {
+          self.setForm(formName, {
+            name: formName,
+            $apiName: apiName,
+            $modelName: modelName,
+            $pk: modelPk,
+            data: values,
+          })
           apisStore[apiName][modelName].asyncGetByPk(modelPk)
             .then(model => {
               const data = {

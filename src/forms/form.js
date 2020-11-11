@@ -35,12 +35,6 @@ const changeData = (oldData, nextData) => {
   return data
 }
 
-export const emptyForm = {
-  data: {},
-  errors: {},
-  hasErrors: false,
-}
-
 const MainForm = types.model(`form`, {
   name: types.identifier,
   $apiName: 'default',
