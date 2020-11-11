@@ -336,7 +336,7 @@ export default (
         if (!method) {
           method = pk ? 'PATCH' : 'POST'
         }
-        apiAdapter[method](options.endpoint || modelEndpoint, { ...options, pk, body })
+        return apiAdapter[method](options.endpoint || modelEndpoint, { ...options, pk, body })
           .then(resp => {
             const { status, error, data } = resp
             if (status) {

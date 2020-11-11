@@ -95,7 +95,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
     setItemLoading(pk: any, loading: any): void;
     setItemError(pk: any, error: any, errorData: any): void;
     setItemDeleted(pk: any): void;
-    upsert(pk: any, body: any, options?: {}): void;
+    upsert(pk: any, body: any, options?: {}): any;
     deleteByPk(pk: any, options?: {}): void;
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>;
 export default _default;
