@@ -66,9 +66,12 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         readonly pk: any;
         readonly modelData: {};
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>>)[];
+    getPageLoading(page?: number, pageSize?: number, options?: {}): boolean;
     getInfinityPages(pageSize?: number, options?: {}, includeDeleted?: boolean): any[];
+    getInfinityPagesLoading(pageSize?: number, options?: {}): boolean;
     getInfinityNextPageNumber(pageSize?: number, options?: {}): number | undefined;
     getInfinityNextPage(pageSize?: number, options?: {}): void;
+    getPagesCount(pageSize?: number, options?: {}): number;
 } & {
     createItem(data: any): ({
         $modelName: any;
@@ -92,6 +95,7 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
         readonly modelData: {};
     }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>) | undefined;
     createList(url: any, page: number | undefined, pageSize: number | undefined, responseData: any): void;
+    setListLoading(url: any, page: number | undefined, pageSize: number | undefined, loading: any): void;
     setItemLoading(pk: any, loading: any): void;
     setItemError(pk: any, error: any, errorData: any): void;
     setItemDeleted(pk: any): void;

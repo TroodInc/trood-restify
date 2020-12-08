@@ -117,13 +117,17 @@ export default (
       asyncGetPage(page = 0, pageSize = 0, options = {}, includeDeleted = false) {
         const url = apiAdapter.getUrl(modelEndpoint, options)
         self.createList(url, page, pageSize)
-        return apiAdapter.GET(modelEndpoint, { ...options, page, pageSize })
+        return apiAdapter.GET(
+          modelEndpoint,
+          { ...options, page, pageSize },
+          () => self.setListLoading(url, page, pageSize, true)
+        )
           .then(resp => {
             if (resp.status) {
+              self.setListLoading(url, page, pageSize, false)
               self.createList(url, page, pageSize, resp)
             }
             const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
-            if (!pageItem) return []
             return Array.from(pageItem.items.values())
               .filter(item => includeDeleted || !item.$deleted)
           })
@@ -132,9 +136,22 @@ export default (
         const url = apiAdapter.getUrl(modelEndpoint, options)
         self.asyncGetPage(page, pageSize, options)
         const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
-        if (!pageItem) return []
         return Array.from(pageItem.items.values())
           .filter(item => includeDeleted || !item.$deleted)
+      },
+      getPageLoading(page = 0, pageSize = 0, options = {}) {
+        const url = apiAdapter.getUrl(modelEndpoint, options)
+        const listItem = self.lists.get(url)
+        if (listItem) {
+          const pageSizeItem = listItem.pageSizes.get(pageSize)
+          if (pageSizeItem) {
+            const pageItem = pageSizeItem.pages.get(page)
+            if (pageItem) {
+              return pageItem.$loading
+            }
+          }
+        }
+        return false
       },
       getInfinityPages(pageSize = 0, options = {}, includeDeleted = false) {
         let page = 0
@@ -155,22 +172,47 @@ export default (
         }
         return items.filter(item => includeDeleted || !item.$deleted)
       },
+      getInfinityPagesLoading(pageSize = 0, options = {}) {
+        let loading = false
+        const url = apiAdapter.getUrl(modelEndpoint, options)
+        if (self.lists.has(url) && self.lists.get(url).pageSizes.has(pageSize)) {
+          let page = 0
+          let pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
+          while (!loading && pageItem) {
+            loading = loading || pageItem.$loading
+            page += 1
+            pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
+          }
+        }
+        return loading
+      },
       getInfinityNextPageNumber(pageSize = 0, options = {}) {
         let page = 0
         const url = apiAdapter.getUrl(modelEndpoint, options)
-        const { count, pageSizes } = self.lists.get(url)
-        const { pages } = pageSizes.get(pageSize)
-        while (pages.has(page)) {
-          page += 1
+        if (self.lists.has(url)) {
+          const { count, pageSizes } = self.lists.get(url)
+          const { pages } = pageSizes.get(pageSize)
+          while (pages.has(page)) {
+            page += 1
+          }
+          if (page * pageSize > count) return undefined
+          return page
         }
-        if (page * pageSize > count) return undefined
-        return page
+        return  0
       },
       getInfinityNextPage(pageSize = 0, options = {}) {
         const page = self.getInfinityNextPageNumber(pageSize, options)
         if (page !== undefined) {
           self.asyncGetPage(page, pageSize, options)
         }
+      },
+      getPagesCount(pageSize = 0, options = {}) {
+        const url = apiAdapter.getUrl(modelEndpoint, options)
+        const listItem = self.lists.get(url)
+        if (listItem) {
+          return Math.ceil(listItem.count / pageSize)
+        }
+        return 0
       },
     }))
     .actions(self => ({
@@ -244,8 +286,13 @@ export default (
         let pageSizeData
         let listData
         if (!responseData) {
+          pageData = {
+            page,
+            items: {},
+          }
           pageSizeData = {
             pageSize,
+            pages: { [page]: pageData },
           }
           listData = {
             url,
@@ -298,14 +345,24 @@ export default (
             } else if (!pageItem && pageData) {
               pageSizeItem.pages.set(page, pageData)
             }
-          } else {
-            listItem.pageSizes.set(pageSize, pageSizeData)
           }
         } else {
           self.lists.set(url, listData)
         }
         if (listData.count) {
           listItem.count = listData.count
+        }
+      },
+      setListLoading(url, page = 0, pageSize = 0, loading) {
+        const listItem = self.lists.get(url)
+        if (listItem) {
+          const pageSizeItem = listItem.pageSizes.get(pageSize)
+          if (pageSizeItem) {
+            const pageItem = pageSizeItem.pages.get(page)
+            if (pageItem) {
+              pageItem.$loading = loading
+            }
+          }
         }
       },
       setItemLoading(pk, loading) {

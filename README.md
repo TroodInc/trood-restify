@@ -146,6 +146,11 @@ It use in classic pagination case.
 If page and pageSize is zero or undefined - http request sending without pagination params.  
 You need use it in mobx observer
 
+**`objStore.getPageLoading(page<number>, pageSize<number>, options<object>)`** -
+method return boolean  
+if page loading already started and not finished - return true  
+else false
+
 **`objStore.asyncPage(page<number>, pageSize<number>, options<object>, includeDeleted<bool>)`** - same as getPage,
 but entity array return in Promise
 
@@ -156,6 +161,11 @@ If you have loaded pages with number 0,1,2,5,6 - getInfinityPages return entitie
 If pageSize is zero or undefined - http request sending without pagination params.  
 You need use it in mobx observer
 
+**`objStore.getInfinityPagesLoading(pageSize<number>, options<object>)`** -
+method return boolean  
+if one of infinity pages loading already started and not finished - return true  
+else false
+
 **`objStore.getInfinityNextPageNumber(pageSize<number>, options<object>)`** -
 method return number or undefined.  
 If you haven't loaded page - return 0  
@@ -165,6 +175,12 @@ If total count of entity returned from backend less when nextPageNumber * pageSi
 
 **`objStore.getInfinityNextPage(pageSize<number>, options<object>)`** -
 method initialize request for load page with pageSize and pageNumber returned from getInfinityNextPageNumber
+
+**`objStore.getPagesCount(pageSize<number>, options<object>)`** -
+method return number  
+before loaded one of page with options - return 0  
+after - return count of pages  
+example: item count from [arrayCountAddress](#api-configuration) = 128, pageSize = 40 - will be return 4
 
 ***options in all method**
 ```
