@@ -15,7 +15,7 @@ const getFkType = (apiName, modelName, getStore, getItemModel) => {
       set(value) {
         return value.pk
       },
-    }
+    },
   ))
 }
 
@@ -49,7 +49,7 @@ const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemMo
     return types.union(
       types.null,
       types.undefined,
-      ...fkModelNames.map(model => getFkType(model.apiName, model.modelName, getStore, getItemModel))
+      ...fkModelNames.map(model => getFkType(model.apiName, model.modelName, getStore, getItemModel)),
     )
   }
 
@@ -58,7 +58,7 @@ const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemMo
     return types.optional(types.array(types.union(
       types.null,
       types.undefined,
-      ...fkArrayModelNames.map(model => getFkType(model.apiName, model.modelName, getStore, getItemModel))
+      ...fkArrayModelNames.map(model => getFkType(model.apiName, model.modelName, getStore, getItemModel)),
     )), [])
   }
 

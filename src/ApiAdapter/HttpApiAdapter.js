@@ -206,7 +206,7 @@ class HttpApiAdapter {
         return {
           status: 401,
           error: {
-            global: `Authorization token is required`,
+            global: 'Authorization token is required',
           },
         }
       }

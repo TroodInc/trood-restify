@@ -1,7 +1,7 @@
 import { types } from 'mobx-state-tree'
 
 
-const Item = types.model(`default_model`, {
+const Item = types.model('default_model', {
   url: types.identifier,
   data: types.maybeNull(types.frozen()),
   $loading: false,
@@ -9,7 +9,7 @@ const Item = types.model(`default_model`, {
   $errorData: types.maybeNull(types.frozen()),
 })
 
-export default (apiAdapter) => types.model(`default_list`, {
+export default (apiAdapter) => types.model('default_list', {
   modelName: types.identifier,
   items: types.map(Item),
 })

@@ -35,7 +35,7 @@ const changeData = (oldData, nextData) => {
   return data
 }
 
-const MainForm = types.model(`form`, {
+const MainForm = types.model('form', {
   name: types.identifier,
   $apiName: 'default',
   $modelName: 'default',

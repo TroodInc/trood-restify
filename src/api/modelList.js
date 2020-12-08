@@ -70,7 +70,7 @@ export default (
                 !target.$loadedById &&
                 !target.$error
               ) {
-                  modelStore.getByPk(target.pk)
+                modelStore.getByPk(target.pk)
               }
               return value
             },
@@ -120,24 +120,42 @@ export default (
         return apiAdapter.GET(
           modelEndpoint,
           { ...options, page, pageSize },
-          () => self.setListLoading(url, page, pageSize, true)
+          () => self.setListLoading(url, page, pageSize, true),
         )
           .then(resp => {
             if (resp.status) {
               self.setListLoading(url, page, pageSize, false)
               self.createList(url, page, pageSize, resp)
             }
-            const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
-            return Array.from(pageItem.items.values())
-              .filter(item => includeDeleted || !item.$deleted)
+            const listItem = self.lists.get(url)
+            if (listItem) {
+              const pageSizeItem = listItem.pageSizes.get(pageSize)
+              if (pageSizeItem) {
+                const pageItem = pageSizeItem.pages.get(page)
+                if (pageItem) {
+                  return Array.from(pageItem.items.values())
+                    .filter(item => includeDeleted || !item.$deleted)
+                }
+              }
+            }
+            return []
           })
       },
       getPage(page = 0, pageSize = 0, options = {}, includeDeleted = false) {
         const url = apiAdapter.getUrl(modelEndpoint, options)
         self.asyncGetPage(page, pageSize, options)
-        const pageItem = self.lists.get(url).pageSizes.get(pageSize).pages.get(page)
-        return Array.from(pageItem.items.values())
-          .filter(item => includeDeleted || !item.$deleted)
+        const listItem = self.lists.get(url)
+        if (listItem) {
+          const pageSizeItem = listItem.pageSizes.get(pageSize)
+          if (pageSizeItem) {
+            const pageItem = pageSizeItem.pages.get(page)
+            if (pageItem) {
+              return Array.from(pageItem.items.values())
+                .filter(item => includeDeleted || !item.$deleted)
+            }
+          }
+        }
+        return []
       },
       getPageLoading(page = 0, pageSize = 0, options = {}) {
         const url = apiAdapter.getUrl(modelEndpoint, options)
@@ -345,6 +363,8 @@ export default (
             } else if (!pageItem && pageData) {
               pageSizeItem.pages.set(page, pageData)
             }
+          } else {
+            listItem.pageSizes.set(pageSize, pageSizeData)
           }
         } else {
           self.lists.set(url, listData)
