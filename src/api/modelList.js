@@ -209,12 +209,14 @@ export default (
         const url = apiAdapter.getUrl(modelEndpoint, options)
         if (self.lists.has(url)) {
           const { count, pageSizes } = self.lists.get(url)
-          const { pages } = pageSizes.get(pageSize)
-          while (pages.has(page)) {
-            page += 1
+          if (pageSizes.has(pageSize)) {
+            const { pages } = pageSizes.get(pageSize)
+            while (pages.has(page)) {
+              page += 1
+            }
+            if (page * pageSize > count) return undefined
+            return page
           }
-          if (page * pageSize > count) return undefined
-          return page
         }
         return  0
       },
