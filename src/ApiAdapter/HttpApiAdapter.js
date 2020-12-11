@@ -119,9 +119,9 @@ class HttpApiAdapter {
           const keyValue = filters[key]
           if (Array.isArray(keyValue)) {
             keyValue.forEach(item => {
-              url.searchParams.append(key, item)
+              if (item !== undefined) url.searchParams.append(key, item)
             })
-          } else {
+          } else if (keyValue !== undefined) {
             url.searchParams.append(key, keyValue)
           }
         })
