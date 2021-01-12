@@ -81,18 +81,19 @@ export default (
   })
     .views(self => ({
       asyncGetByPk(pk, options = {}, includeDeleted = false) {
-        const item = self.items.get(pk) || {}
+        const normalPk = modelFields[modelPk] === 'number' ? +pk : pk.toString()
+        const item = self.items.get(normalPk) || {}
         if (item.$error) {
-          return Promise.resolve(() => self.items.getWithProxy(pk, getStore()) || {})
+          return Promise.resolve(() => self.items.getWithProxy(normalPk, getStore()) || {})
         }
-        self.createItem(pk)
-        return apiAdapter.GET(modelEndpoint, { ...options, pk }, () => {
-          self.setItemLoading(pk, true)
+        self.createItem(normalPk)
+        return apiAdapter.GET(modelEndpoint, { ...options, pk: normalPk }, () => {
+          self.setItemLoading(normalPk, true)
         })
           .then(({ status, error, data }) => {
             if (status) {
               if (error) {
-                self.setItemError(pk, status, error)
+                self.setItemError(normalPk, status, error)
               } else {
                 self.createItem({
                   ...data,
@@ -103,7 +104,7 @@ export default (
                 })
               }
             }
-            const result = self.items.getWithProxy(pk, getStore()) || {}
+            const result = self.items.getWithProxy(normalPk, getStore()) || {}
             if (!includeDeleted && result.$deleted) return {}
             return result
           })
