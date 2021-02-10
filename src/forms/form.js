@@ -62,8 +62,8 @@ const MainForm = types.model('form', {
 
 const formsModels = {}
 
-export default (apiName = 'default', modelName = 'default', apisStore) => {
-  let formModel = get(formsModels, [apiName, modelName])
+export default (apiName = 'default', modelName = 'default', formName, apisStore) => {
+  let formModel = get(formsModels, [apiName, modelName, formName])
   if (formModel) return formModel
 
   const modelStore = apisStore[apiName][modelName]
@@ -77,7 +77,7 @@ export default (apiName = 'default', modelName = 'default', apisStore) => {
     },
   }))
 
-  set(formsModels, [apiName, modelName], formModel)
+  set(formsModels, [apiName, modelName, formName], formModel)
 
   return formModel
 }

@@ -6,7 +6,7 @@ import getForm from './form'
 const getForms = (apisStore) => types.model('forms', {
   forms: types.map(types.union({
     dispatcher: snapshot => {
-      return getForm(snapshot.$apiName, snapshot.$modelName, apisStore)
+      return getForm(snapshot.$apiName, snapshot.$modelName, snapshot.name, apisStore)
     },
   })),
 })
