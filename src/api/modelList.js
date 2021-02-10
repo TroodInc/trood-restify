@@ -90,23 +90,22 @@ export default (
         return apiAdapter.GET(modelEndpoint, { ...options, pk: normalPk }, () => {
           self.setItemLoading(normalPk, true)
         })
-          .then(({ status, error, data }) => {
+          .then(({ status, data }) => {
             if (status) {
-              if (error) {
-                self.setItemError(normalPk, status, error)
-              } else {
-                self.createItem({
-                  ...data,
-                  $loading: false,
-                  $loadedById: !options.filters || item.$loadedById,
-                  $error: 0,
-                  $errorData: null,
-                })
-              }
+              self.createItem({
+                ...data,
+                $loading: false,
+                $loadedById: !options.filters || item.$loadedById,
+                $error: 0,
+                $errorData: null,
+              })
             }
             const result = self.items.getWithProxy(normalPk, getStore()) || {}
             if (!includeDeleted && result.$deleted) return {}
             return result
+          })
+          .catch(({ status, error }) => {
+            self.setItemError(normalPk, status, error)
           })
       },
       getByPk(pk, options = {}, includeDeleted = false) {
@@ -140,6 +139,10 @@ export default (
               }
             }
             return []
+          })
+          .catch(resp => {
+            self.setListLoading(url, page, pageSize, false)
+            self.createList(url, page, pageSize, resp)
           })
       },
       getPage(page = 0, pageSize = 0, options = {}, includeDeleted = false) {
@@ -418,20 +421,21 @@ export default (
         }
         return apiAdapter[method](options.endpoint || modelEndpoint, { ...options, pk, body })
           .then(resp => {
-            const { status, error, data } = resp
+            const { status, data } = resp
             if (status) {
-              if (error) {
-                if (pk) self.setItemError(pk, status, error)
-              } else {
-                self.createItem({
-                  ...data,
-                  $loading: false,
-                  $error: 0,
-                  $errorData: null,
-                })
-              }
+              self.createItem({
+                ...data,
+                $loading: false,
+                $error: 0,
+                $errorData: null,
+              })
             }
             return resp
+          })
+          .catch(resp => {
+            const { status, error } = resp
+            if (pk) self.setItemError(pk, status, error)
+            return Promise.reject(resp)
           })
       },
       deleteByPk(pk, options = {}) {

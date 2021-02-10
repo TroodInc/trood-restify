@@ -65,12 +65,12 @@ class HttpApiAdapter {
     const responseFormat = RESPONSE_FORMATS[format || this.defaultResponseFormat]
     if (!responseFormat) {
       console.error(`Error. Unknown format "${format || this.defaultResponseFormat}"`)
-      return {
+      return Promise.reject({
         status: 500,
         error: {
           global: `Unknown format "${format || this.defaultResponseFormat}"`,
         },
-      }
+      })
     }
     const respData = await response[responseFormat]()
     const respDataAddress = pk ? this.entityDataAddress : this.arrayDataAddress
@@ -81,10 +81,18 @@ class HttpApiAdapter {
     if (!pk) {
       count = this.arrayCountAddress ? get(respData, this.arrayCountAddress) : data.length
     }
+    if (response.status >= 400) {
+      return Promise.reject({
+        status: response.status,
+        data: undefined,
+        error,
+        count,
+      })
+    }
     return {
       status: response.status,
-      data: response.status < 400 ? data : undefined,
-      error: response.status < 400 ? undefined : error,
+      data,
+      error: undefined,
       count,
     }
   }
@@ -185,12 +193,12 @@ class HttpApiAdapter {
       })
     } catch (e) {
       console.error(`Error. ${e}`)
-      return {
+      return Promise.reject({
         status: 500,
         error: {
           global: e,
         },
-      }
+      })
     }
 
     const uuid = objectHash({ url, method })
@@ -203,12 +211,12 @@ class HttpApiAdapter {
       })
       if (isTokenRequired) {
         console.warn(`Called ${url} which requires token, but there was no token found!`)
-        return {
+        return Promise.reject({
           status: 401,
           error: {
             global: 'Authorization token is required',
           },
-        }
+        })
       }
     }
 

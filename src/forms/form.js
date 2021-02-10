@@ -70,9 +70,11 @@ export default (apiName = 'default', modelName = 'default', formName, apisStore)
   formModel = MainForm.extend(self => ({
     actions: {
       submit(options, remove = false) {
-        const resp = modelStore.upsert(self.$pk, JSON.stringify(self.data), options)
-        if (remove) self.remove()
-        return resp
+        return modelStore.upsert(self.$pk, JSON.stringify(self.data), options)
+          .then(res => {
+            if (remove) self.remove()
+            return res
+          })
       },
     },
   }))

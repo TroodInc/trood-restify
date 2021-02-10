@@ -18,15 +18,14 @@ export default (apiAdapter) => types.model('default_list', {
       const url = apiAdapter.getUrl(endpoint, options)
       self.createItem(url, { $loading: true })
       return apiAdapter.GET(endpoint, options)
-        .then(({ status, error, data }) => {
+        .then(({ status, data }) => {
           if (status) {
-            if (error) {
-              self.setItemError(url, status, error)
-            } else {
-              self.createItem(url, { data })
-            }
+            self.createItem(url, { data })
           }
           return (self.items.get(url) || {}).data
+        })
+        .catch(({ status, error }) => {
+          self.setItemError(url, status, error)
         })
     },
     getData(endpoint, options = {}) {
