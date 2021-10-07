@@ -22,10 +22,10 @@ const changeData = (oldData, nextData) => {
   const data = cloneDeep(oldData)
   Object.keys(nextData).forEach(key => {
     const nextValue = get(nextData, key)
-    if (typeof nextValue === 'object' && nextValue !== null) {
+    if (typeof nextValue === 'object' && !Array.isArray(nextValue) && nextValue !== null) {
       let oldValue = get(data, key)
       if (typeof oldValue !== 'object' || oldValue === null) {
-        oldValue = Array.isArray(nextValue) ? [] : {}
+        oldValue = {}
       }
       set(data, key, changeData(oldValue, nextValue))
     } else {
@@ -62,7 +62,7 @@ const MainForm = types.model('form', {
 
 const formsModels = {}
 
-export default (apiName = 'default', modelName = 'default', formName, apisStore) => {
+const form = (apiName = 'default', modelName = 'default', formName, apisStore) => {
   let formModel = get(formsModels, [apiName, modelName, formName])
   if (formModel) return formModel
 
@@ -83,3 +83,5 @@ export default (apiName = 'default', modelName = 'default', formName, apisStore)
 
   return formModel
 }
+
+export default form

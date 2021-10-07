@@ -13,8 +13,7 @@ const setItemModel = (apiName, modelName, model) => {
   if (!registeredItemModels[apiName]) registeredItemModels[apiName] = {}
   registeredItemModels[apiName][modelName] = model
 }
-
-export default (meta = {}, getToken) => {
+const getApisStore = (meta = {}, getToken) => {
   Object.keys(meta).forEach(apiName => {
     if (!store[apiName]) store[apiName] = {}
     const apiConfig = meta[apiName]
@@ -47,3 +46,5 @@ export default (meta = {}, getToken) => {
 
   return store
 }
+
+export default getApisStore

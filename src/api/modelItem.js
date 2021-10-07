@@ -65,7 +65,7 @@ const parseFieldType = (apiName, fieldType = '', pk = false, getStore, getItemMo
   return types.maybeNull(types.frozen())
 }
 
-export default (apiName, modelName, modelPk, modelFields, getStore, getItemModel) => {
+const modelItem = (apiName, modelName, modelPk, modelFields, getStore, getItemModel) => {
   const fields = Object.keys(modelFields).reduce((memo, field) => {
     const fieldType = modelFields[field]
     return {
@@ -97,3 +97,5 @@ export default (apiName, modelName, modelPk, modelFields, getStore, getItemModel
       },
     }))
 }
+
+export default modelItem

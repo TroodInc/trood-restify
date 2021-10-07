@@ -17,7 +17,7 @@ const getReferences = type => {
   return undefined
 }
 
-export default (
+const modelList = (
   {
     apiAdapter,
     modelName,
@@ -444,3 +444,5 @@ export default (
       },
     }))
 }
+
+export default modelList

@@ -132,4 +132,6 @@ const getForms = (apisStore) => types.model('forms', {
     },
   }))
 
-export default (apisStore) => getForms(apisStore).create()
+const getFormsStore = (apisStore) => getForms(apisStore).create()
+
+export default getFormsStore

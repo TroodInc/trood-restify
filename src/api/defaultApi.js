@@ -9,7 +9,7 @@ const Item = types.model('default_model', {
   $errorData: types.maybeNull(types.frozen()),
 })
 
-export default (apiAdapter) => types.model('default_list', {
+const defaultApi = (apiAdapter) => types.model('default_list', {
   modelName: types.identifier,
   items: types.map(Item),
 })
@@ -61,3 +61,5 @@ export default (apiAdapter) => types.model('default_list', {
       return apiAdapter[method](options.endpoint, { ...options, pk, body })
     },
   }))
+
+export default defaultApi
