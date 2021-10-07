@@ -1,4 +1,5 @@
-declare function _default(apiAdapter: any): import("mobx-state-tree").IModelType<{
+export default defaultApi;
+declare function defaultApi(apiAdapter: any): import("mobx-state-tree").IModelType<{
     modelName: import("mobx-state-tree").ISimpleType<string>;
     items: import("mobx-state-tree").IMapType<import("mobx-state-tree").IModelType<{
         url: import("mobx-state-tree").ISimpleType<string>;
@@ -15,4 +16,3 @@ declare function _default(apiAdapter: any): import("mobx-state-tree").IModelType
     setItemError(url: any, status: any, error: any): void;
     upsert(pk: any, body: any, options?: {}): any;
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>;
-export default _default;

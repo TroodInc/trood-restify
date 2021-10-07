@@ -1,4 +1,5 @@
-declare function _default(apisStore: any): {
+export default getFormsStore;
+declare function getFormsStore(apisStore: any): {
     forms: import("mobx-state-tree").IMSTMap<import("mobx-state-tree").IAnyType> & import("mobx-state-tree").IStateTreeNode<import("mobx-state-tree").IMapType<import("mobx-state-tree").IAnyType>>;
 } & import("mobx-state-tree/dist/internal").NonEmptyObject & {
     getFormName({ formName, apiName, modelName, modelPk, }?: {
@@ -65,4 +66,3 @@ declare function _default(apisStore: any): {
     setForm(formName: any, data: any): void;
     removeItem(item: any): void;
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>>;
-export default _default;

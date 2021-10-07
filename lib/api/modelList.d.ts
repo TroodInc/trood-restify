@@ -1,4 +1,5 @@
-declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, modelFields, }: {
+export default modelList;
+declare function modelList({ apiAdapter, modelName, modelPk, modelEndpoint, modelFields, }: {
     apiAdapter: any;
     modelName: any;
     modelPk: any;
@@ -102,4 +103,3 @@ declare function _default({ apiAdapter, modelName, modelPk, modelEndpoint, model
     upsert(pk: any, body: any, options?: {}): any;
     deleteByPk(pk: any, options?: {}): void;
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>;
-export default _default;

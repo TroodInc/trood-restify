@@ -1,4 +1,5 @@
-declare function _default(apiName: any, modelName: any, modelPk: any, modelFields: any, getStore: any, getItemModel: any): import("mobx-state-tree").IModelType<{
+export default modelItem;
+declare function modelItem(apiName: any, modelName: any, modelPk: any, modelFields: any, getStore: any, getItemModel: any): import("mobx-state-tree").IModelType<{
     $modelName: any;
     $loading: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
     $loadedById: import("mobx-state-tree").IType<boolean | undefined, boolean, boolean>;
@@ -9,4 +10,3 @@ declare function _default(apiName: any, modelName: any, modelPk: any, modelField
     readonly pk: any;
     readonly modelData: {};
 }, import("mobx-state-tree")._NotCustomized, import("mobx-state-tree")._NotCustomized>;
-export default _default;

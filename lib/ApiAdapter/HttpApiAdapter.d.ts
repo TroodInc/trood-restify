@@ -35,16 +35,9 @@ declare class HttpApiAdapter {
     arrayCountAddress: any;
     getItemGenericType(item: any): any;
     getResponseData(response: any, format: any, pk: any): Promise<{
-        status: number;
-        error: {
-            global: string;
-        };
-        data?: undefined;
-        count?: undefined;
-    } | {
         status: any;
         data: any;
-        error: any;
+        error: undefined;
         count: number;
     }>;
     getUrl(endpoint: any, { pk, filters, hash, page, pageSize, }?: {
@@ -68,85 +61,49 @@ declare class HttpApiAdapter {
     }, beforeHttpCall?: () => void): Promise<{
         status: any;
         data: any;
-        error: any;
+        error: undefined;
         count: number;
     } | {
         status: number;
-        error: {
-            global: any;
-        };
-    } | {
-        status: number;
-        error?: undefined;
     }>;
     GET: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
-        error: any;
+        error: undefined;
         count: number;
     } | {
         status: number;
-        error: {
-            global: any;
-        };
-    } | {
-        status: number;
-        error?: undefined;
     }>;
     POST: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
-        error: any;
+        error: undefined;
         count: number;
     } | {
         status: number;
-        error: {
-            global: any;
-        };
-    } | {
-        status: number;
-        error?: undefined;
     }>;
     PUT: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
-        error: any;
+        error: undefined;
         count: number;
     } | {
         status: number;
-        error: {
-            global: any;
-        };
-    } | {
-        status: number;
-        error?: undefined;
     }>;
     PATCH: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
-        error: any;
+        error: undefined;
         count: number;
     } | {
         status: number;
-        error: {
-            global: any;
-        };
-    } | {
-        status: number;
-        error?: undefined;
     }>;
     DELETE: (endpoint: any, options?: {}, ...other: any[]) => Promise<{
         status: any;
         data: any;
-        error: any;
+        error: undefined;
         count: number;
     } | {
         status: number;
-        error: {
-            global: any;
-        };
-    } | {
-        status: number;
-        error?: undefined;
     }>;
 }
