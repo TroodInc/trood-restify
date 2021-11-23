@@ -263,7 +263,11 @@ class HttpApiAdapter {
       HttpApiAdapter.cache[uuid] = new Date().getTime()
     }
 
-    return responseData
+    return {
+      url,
+      method,
+      ...responseData,
+    }
   }
 
   GET = (endpoint, options = {}, ...other) =>

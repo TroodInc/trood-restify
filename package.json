@@ -34,7 +34,8 @@
     "precommit": "npm run lint",
     "lint": "eslint src/ --ext .js",
     "ts:defs": "tsc --declaration --emitDeclarationOnly -p tsconfig.json",
-    "build": "npm run ts:defs && cross-env NODE_ENV=production && webpack"
+    "build": "npm run ts:defs && cross-env NODE_ENV=production && webpack",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
