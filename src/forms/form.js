@@ -55,6 +55,10 @@ const MainForm = types.model('form', {
     changeFieldsErrors(errors) {
       self.errors = changeData(self.errors, errors)
     },
+    clearForm() {
+      self.errors = {}
+      self.data = {}
+    },
     remove() {
       getParent(self, 2).removeItem(self)
     },
