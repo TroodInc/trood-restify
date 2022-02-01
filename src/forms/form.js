@@ -73,8 +73,8 @@ const form = (apiName = 'default', modelName = 'default', formName, apisStore) =
   const modelStore = apisStore[apiName][modelName]
   formModel = MainForm.extend(self => ({
     actions: {
-      submit(options, remove = false) {
-        return modelStore.upsert(self.$pk, JSON.stringify(self.data), options)
+      submit(options, remove = false, transform = v => v) {
+        return modelStore.upsert(self.$pk, JSON.stringify(transform(self.data)), options)
           .then(res => {
             if (remove) self.remove()
             return res
