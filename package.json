@@ -24,8 +24,8 @@
     "eslint": "^7.9.0",
     "pre-commit": "^1.2.2",
     "typescript": "^4.0.2",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "ts-node": "^10.9.1",
+    "esbuild": "^0.14.49"
   },
   "peerDependencies": {
     "mobx": "^5.15.6"
@@ -34,7 +34,7 @@
     "precommit": "npm run lint",
     "lint": "eslint src/ --ext .js",
     "ts:defs": "tsc --declaration --emitDeclarationOnly -p tsconfig.json",
-    "build": "npm run ts:defs && cross-env NODE_ENV=production && webpack",
+    "build": "npm run ts:defs && cross-env NODE_ENV=production && node ./esbuild-config.js",
     "prepare": "npm run build"
   },
   "repository": {

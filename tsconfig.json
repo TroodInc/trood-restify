@@ -21,7 +21,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "jsx": "preserve",
-    "isolatedModules": false,
+    "isolatedModules": true,
     "typeRoots": [ "./types", "./node_modules/@types"]
   },
   "include": [
