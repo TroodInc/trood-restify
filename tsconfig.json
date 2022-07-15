@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "amd",
+    "target": "esnext",
+    "module": "esnext",
     "lib": [
       "dom",
       "dom.iterable",
