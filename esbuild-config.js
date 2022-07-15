@@ -14,10 +14,12 @@ build({
   ...shared,
   format: 'esm',
   outfile: path.resolve(__dirname, 'lib', 'index.esm.js'),
+  target: ['esnext', 'node10'],
 })
 
 build({
   ...shared,
   format: 'cjs',
   outfile: path.resolve(__dirname, 'lib', 'index.cjs.js'),
+  target: ['esnext', 'node10'],
 })
