@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "esnext",
+    "module": "commonjs",
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext",
+      "esnext"
     ],
     "paths": {
       "~/*": ["src/*"]
