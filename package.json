@@ -6,8 +6,8 @@
   "directories": {
     "lib": "lib"
   },
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
   "dependencies": {
     "lodash": "^4.17.20",
