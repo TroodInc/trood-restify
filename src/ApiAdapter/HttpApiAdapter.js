@@ -36,10 +36,10 @@ class HttpApiAdapter {
     this.apiName = apiName
     this.apiHost = apiHost
     if (!this.apiHost) {
-      this.apiHost = window.location.host
+      this.apiHost = window?.location?.host
     }
     if (!/https?/.test(this.apiHost)) {
-      this.apiHost = `${window.location.protocol}//${this.apiHost}`
+      this.apiHost = `${window?.location?.protocol}//${this.apiHost}`
     }
     this.getToken = getToken
     this.headers = headers
